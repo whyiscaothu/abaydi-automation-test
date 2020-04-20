@@ -1,0 +1,11 @@
+exports.specialRequest      = 'IT Test';
+exports.firstName           = 'Hai';
+exports.lastName            = 'Nguyen';
+exports.email               = 'haib@abaydi.com';
+exports.phoneNumber         = '0909393979';
+exports.ver2VietnamValue    = '257';
+exports.vnCodeAlpha2ISO     = 'VN';//ISO 3166-1 alpha-2 code
+exports.city                = 'TPHCM';
+exports.address             = '211/136, Hoàng Hoa Thám, Phường 5, Quận Phú Nhuận';
+exports.cardNumber          = '4111 1111 1111 1111';
+exports.cardCVV             = '456';

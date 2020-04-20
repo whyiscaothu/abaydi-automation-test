@@ -1,0 +1,10 @@
+exports.billingFirstName= '#txtBillingFirstName';
+exports.billingLastName = '#txtBillingLastName';
+exports.billingCountry  = '#selBillingCountry';
+exports.billingCity     = '#txtBillingCity';
+exports.billingAddress  = '#txtBillingAddress';
+exports.cardNumber      = '#txtCardNumber';
+exports.billingMonth    = '#selBillingMonth';
+exports.billingYear     = '#selBillingYear';
+exports.billingCVV2     = '#txtBillingCVV2';
+exports.orderS2Submit   = '[name="btnStep2"]';
