@@ -1,8 +1,8 @@
-
 const puppeteer             = require('puppeteer');
+const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
 const data                  = require('./input/data');
-const urls                  = require('./input/urls');
+const { urls }              = require('./input/urls');
 const selectorVer2Step1     = require('./selector/ver2/step1');
 const selectorVer2Step2a    = require('./selector/ver2/step2a');
 const selectorVer2Step2b    = require('./selector/ver2/step2b');
@@ -40,56 +40,27 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
 
 
 (async () => {//Immediately Invoked Function Expression (IIFE)
-    for await (const link of urls.getUrls.url) {
-
-
-        // let count = 0;
-        // while (true){
-        //     count++;
-        //     try{
-        //         await page.waitForNavigation({waitUntil: 'networkidle0'});
-        //         break;
-        //     }catch (e) {
-        //         if(count >= 3){
-        //             break;
-        //         }
-        //         console.log('err reload');
-        //         await page.reload();
-        //     }
-        // }
-
-        const browser = await puppeteer.launch({
+    const cluster = await Cluster.launch({
+        concurrency: Cluster.CONCURRENCY_BROWSER,
+        maxConcurrency: 2,
+        puppeteerOptions: {
             headless: false
+        },
+        timeout: 90000,
+        retryLimit: 3,
+        monitor: true,
+    });
+
+    await cluster.task(async ({ page, data: url }) => {
+        await page.goto(url,{
+            waitUntil: [
+                'load',
+                'domcontentloaded',
+                'networkidle0',
+                'networkidle2'
+            ]
         });
-        const page = await browser.newPage();
 
-        try {
-            await page.goto(link,{
-                waitUntil: [
-                    'load',
-                    'domcontentloaded',
-                    'networkidle0',
-                    'networkidle2'
-                ]
-            });
-            console.log('done goto 1');
-        } catch (e) {
-            if (e instanceof puppeteer.errors.TimeoutError) {
-                // Do something if this is a timeout.
-                await page.goto(link,{
-                    waitUntil: [
-                        'load',
-                        'domcontentloaded',
-                        'networkidle0',
-                        'networkidle2'
-                    ]
-                });
-                console.log('done goto 2');
-
-            }
-        }
-        console.log(`Running test on site "${countTestFlag}"...`);
-        console.log(link);
         let pickRandomValue = async selector => {
             let arrValue = await page.$$eval(`select${selector} option`, options => options.map(option => option.value));
             await arrValue.shift();//Remove first option in select tag.
@@ -98,8 +69,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
 
         isVer2 = await page.$(selectorVer2Step1.slNumberOfVisa);
         if (isVer2) {
-            console.log('Version 2...');
-            console.log('Running Step 1...');
             //Step 1
             //Fill data to input
             await pickRandomValue(selectorVer2Step1.slPortOfArriVal)
@@ -107,7 +76,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
             await expect(page).toSelect(selectorVer2Step1.slPortOfArriVal, ver2RandomValuePoA);
             await expect(page).toClick(selectorVer2Step1.checkVisaFee);
             await expect(page).toClick(selectorVer2Step1.orderS1SubmitVer2, { delay: 500 });
-            console.log('Done Step 1');
             //Step 2a
             await page.waitForNavigation({
                 waitUntil: [
@@ -117,7 +85,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
                     'networkidle2'
                 ]
             });
-            console.log('Running Step 2...');
             await expect(page).toFill(selectorVer2Step2a.fullName, fullName, { delay: 100 });
             await expect(page).toFill(selectorVer2Step2a.birthDay, birthdayVer2, { delay: 100 });
             await expect(page).toFill(selectorVer2Step2a.email, data.email, { delay: 100 });
@@ -151,11 +118,9 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
             await expect(page).toSelect(selectorVer2Step2b.billingYear, currentYear);
             await expect(page).toClick(selectorVer2Step2b.orderS2Submit);
             // await page.waitForXPath('/html/body/div/section/div/div/div/div/h1/span');
-            console.log('Done Step 2');
         } else {
 
             //Step 1
-            console.log('Version 3 or 4...');
 
             await pickRandomValue(selectorVer3Step1.portOfArrival)
                 .then(data => randomValuePoA = data);
@@ -165,7 +130,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
                 .then(data => randomValueVTP = data);
             await pickRandomValue(selectorVer3Step1.selZoneNumber)
                 .then(data => randomValueZN = data);
-            console.log('Running Step 1...');
             await page.type(selectorVer3Step1.dateOfArrival, date, { delay: 100 });
             await page.type(selectorVer3Step1.specialRequest, data.specialRequest, { delay: 100 });
             await page.type(selectorVer3Step1.fullNamePassport, `${data.firstName} ${data.lastName}`, { delay: 100 });
@@ -178,12 +142,9 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
             await page.select(selectorVer3Step1.visaTypePassport, randomValueVTP);
             await page.select(selectorVer3Step1.selZoneNumber, randomValueZN);
             await page.click(selectorVer3Step1.orderS1Submit);
-            console.log('Done Step 1');
 
 
             //Step 2
-            console.log('Running Step 2...');
-            await page.waitForSelector(selectorVer3Step2.checkkPaymentMethodCredit, {visible: true});
             await page.waitForSelector(selectorVer3Step2.firstName, {visible: true});
             await page.waitForSelector(selectorVer3Step2.lastName, {visible: true});
             await page.waitForSelector(selectorVer3Step2.cardMonth, {visible: true});
@@ -191,7 +152,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
             await page.waitForSelector(selectorVer3Step2.cardCVV, {visible: true});
             await page.waitForSelector(selectorVer3Step2.orderS2Submit, {visible: true});
 
-            await page.click(selectorVer3Step2.checkkPaymentMethodCredit);
             await page.type(selectorVer3Step2.firstName, data.firstName, { delay: 100 });
             await page.type(selectorVer3Step2.lastName, data.lastName, { delay: 100 });
             await page.type(selectorVer3Step2.city, data.city, { delay: 100 });
@@ -202,7 +162,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
             await page.type(selectorVer3Step2.cardCVV, data.cardCVV, { delay: 100 });
             await page.select(selectorVer3Step2.countryOfResidence, data.vnCodeAlpha2ISO);
             await page.click(selectorVer3Step2.orderS2Submit);
-            console.log('Done Step 2');
         }
         await page.waitForNavigation({
             waitUntil: [
@@ -212,8 +171,6 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
                 'networkidle2'
             ]
         });
-        console.log('url 1');
-        console.log(await page.url());
         await page.waitForNavigation({
             waitUntil: [
                 'load',
@@ -222,31 +179,36 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
                 'networkidle2'
             ]
         });
-        console.log('url 2');
-        console.log(await page.url());
 
-        console.log('Done 3 Step!');
         //Loop 3 time if TimeoutError
-        while (true){
-            countIsCloseDontBreak++;
-            try {
-                await browser.close();
+
+
+        countTestFlag++;
+    });
+    for (const link of urls.url) {
+        cluster.queue(link);
+    }
+    while (true){
+        countIsCloseDontBreak++;
+        try {
+            await cluster.idle();
+            await cluster.close();
+            break;
+        } catch (err) {
+            if (err instanceof puppeteer.errors.TimeoutError) {
+                // Do something if this is a timeout.
+                await cluster.idle();
+                await cluster.close();
                 break;
-            } catch (err) {
-                if (err instanceof puppeteer.errors.TimeoutError) {
-                    // Do something if this is a timeout.
-                    await browser.close();
-                    break;
-                }
-                if (countIsCloseDontBreak >= 3){
-                    throw new Error(`${err} loop 3 time`)
-                }
+            }
+            if (countIsCloseDontBreak >= 3){
+                throw new Error(`${err} loop 3 time`)
             }
         }
-
-        console.log(`Site "${countTestFlag}" Done!`);
-        console.log(`=========================================`);
-        countTestFlag++;
     }
+
+    // many more pages
+
+
 
 })().catch(err => console.log(err));
