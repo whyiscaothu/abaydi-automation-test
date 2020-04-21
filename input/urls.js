@@ -1,64 +1,65 @@
+const { urls } = require('../server');
 let inputStr = `
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
-https://www.indian-visagov.com/apply-visa true order
-https://www.indian-visagov.com/apply-visa true payment
-https://www.indianvisagov.asia/apply-visa true contact
-https://www.indianvisagov.asia/apply-visa true order
-https://www.indiavisagov.in/apply-visa false order
-https://www.indiavisagov.in/apply-visa true payment
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
+https://www.indian-visagov.com
+https://www.indian-visagov.com
+https://www.indianvisagov.asia
+https://www.indianvisagov.asia
+https://www.indiavisagov.in
+https://www.indiavisagov.in
 `;
 
 

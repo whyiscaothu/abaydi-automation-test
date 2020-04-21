@@ -2,7 +2,7 @@ const puppeteer             = require('puppeteer');
 const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
 const data                  = require('./input/data');
-const { urls }              = require('./input/urls');
+const urls                  = require('./server');
 const selectorVer2Step1     = require('./selector/ver2/step1');
 const selectorVer2Step2a    = require('./selector/ver2/step2a');
 const selectorVer2Step2b    = require('./selector/ver2/step2b');
@@ -15,8 +15,7 @@ let countIsCloseDontBreak;
 let isVer2,
     ver2RandomValuePoA,
     ver2RandomValueToV,
-    ver2RandomValueNationality,
-    ver2RandomValueZN;
+    ver2RandomValueNationality;
 let randomValuePoA, //portOfArrival
     randomValueCP,  //countryPassport
     randomValueVTP, //visaTypePassport
@@ -39,7 +38,7 @@ let birthday            = `${birthdayYear}-${currentMonth}-${currentDate}`;
 let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
 
 
-(async () => {//Immediately Invoked Function Expression (IIFE)
+let runAutomationTest = async () => {//Immediately Invoked Function Expression (IIFE)
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
         maxConcurrency: 2,
@@ -185,8 +184,8 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
 
         countTestFlag++;
     });
-    for (const link of urls.url) {
-        cluster.queue(link);
+    for (const url of urls.urls) {
+        cluster.queue(`${url}/apply-visa`);
     }
     while (true){
         countIsCloseDontBreak++;
@@ -208,7 +207,5 @@ let birthdayVer2        = `${currentDatePlus4}-${currentMonth}-${birthdayYear}`;
     }
 
     // many more pages
-
-
-
-})().catch(err => console.log(err));
+};
+exports.runAutomationTest = runAutomationTest;
