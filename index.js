@@ -23,7 +23,7 @@ let randomValuePoA, //portOfArrival
 let countTestFlag = 1;
 
 
-let fullName            = data.firstName + ' ' + data.lastName;
+let fullName            = `${data.firstName} ${data.lastName}`;
 let today               = new Date();
 let currentDate         = today.getDate();
 today.setDate(currentDate + 4);
