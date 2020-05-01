@@ -4,8 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect server.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*",
+      "db.json"
+    ]
   },
   "repository": {
     "type": "git",
@@ -22,7 +29,7 @@
     "expect-puppeteer": "^4.4.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
-    "pug": "^2.0.4",
+    "lowdb": "^1.0.0",
     "puppeteer": "^3.0.0",
     "puppeteer-cluster": "^0.20.0"
   },

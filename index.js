@@ -20,7 +20,9 @@ let randomValuePoA, //portOfArrival
     randomValueCP,  //countryPassport
     randomValueVTP, //visaTypePassport
     randomValueZN;  //selZoneNumber
-let countTestFlag = 1;
+let isSendMailNotiDone,
+    isSendMailFailDone,
+    orderDone;
 
 
 let fullName            = `${data.firstName} ${data.lastName}`;
@@ -59,6 +61,9 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 'networkidle2'
             ]
         });
+        isSendMailNotiDone  = 'false';
+        isSendMailFailDone          = 'false';
+        orderDone                   = 'false';
 
         let pickRandomValue = async selector => {
             let arrValue = await page.$$eval(`select${selector} option`, options => options.map(option => option.value));
@@ -99,7 +104,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             await expect(page).toSelect(selectorVer2Step2a.typeOfVisa, ver2RandomValueToV);
             await expect(page).toSelect(selectorVer2Step2a.zoneNumber, data.vnCodeAlpha2ISO);
             await expect(page).toClick(selectorVer2Step2a.methodDirect);
-
+            isSendMailNotiDone = 'true';
 
             //step 2b
 
@@ -141,7 +146,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             await page.select(selectorVer3Step1.visaTypePassport, randomValueVTP);
             await page.select(selectorVer3Step1.selZoneNumber, randomValueZN);
             await page.click(selectorVer3Step1.orderS1Submit);
-
+            isSendMailNotiDone = 'true';
 
             //Step 2
             await page.waitForSelector(selectorVer3Step2.firstName, {visible: true});
@@ -178,11 +183,28 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 'networkidle2'
             ]
         });
+        isSendMailFailDone  = 'true';
+        orderDone           = 'true';
+        //Send data to server.js(expressJS)
+        exports.testProgress = {
+            isSendMailNotiDone,
+            isSendMailFailDone,
+            orderDone,
+        };
+        // Event handler to be called in case of problems
+        cluster.on('taskerror', (err, data) => {
+            //In case of problem push error link back to urls array.
+            urls.urls.push(data);
+            exports.testProgress = {
+                isSendMailNotiDone,
+                isSendMailFailDone,
+                orderDone,
+            };
+        });
+
+
 
         //Loop 3 time if TimeoutError
-
-
-        countTestFlag++;
     });
     for (const url of urls.urls) {
         cluster.queue(`${url}/apply-visa`);
@@ -208,4 +230,4 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
 
     // many more pages
 };
-exports.runAutomationTest = runAutomationTest;
+exports.runAutomationTest   = runAutomationTest;
