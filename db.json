@@ -130,9 +130,13 @@
     {
       "id": 1,
       "title": "lowdb is great"
+    },
+    {
+      "id": 1,
+      "title": "lowdb is great"
     }
   ],
-  "count": 43,
+  "count": 44,
   "user": {
     "name": "typicode"
   }

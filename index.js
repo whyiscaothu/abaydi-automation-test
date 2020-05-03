@@ -25,7 +25,7 @@ let isSendMailNotiDone,
     orderDone;
 
 
-let fullName            = `${data.firstName} ${data.lastName}`;
+let fullNameInput       = `${data.firstName} ${data.lastName}`;
 let today               = new Date();
 let currentDate         = today.getDate();
 today.setDate(currentDate + 4);
@@ -61,7 +61,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 'networkidle2'
             ]
         });
-        isSendMailNotiDone  = 'false';
+        isSendMailNotiDone          = 'false';
         isSendMailFailDone          = 'false';
         orderDone                   = 'false';
 
@@ -71,14 +71,22 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             return arrValue[Math.floor(Math.random() * arrValue.length)];
         };
 
-        isVer2 = await page.$(selectorVer2Step1.slNumberOfVisa);
+        isVer2 = await page.$(selectorVer2Step1.slNumberOfVisa) || null;
         if (isVer2) {
             //Step 1
-            //Fill data to input
+            //Check if elements exit
+            let slPortOfArriVal = await page.$(selectorVer2Step1.slPortOfArriVal) || null;
+            let checkVisaFee    = await page.$(selectorVer2Step1.checkVisaFee) || null;
+
             await pickRandomValue(selectorVer2Step1.slPortOfArriVal)
                 .then(data => ver2RandomValuePoA = data);
-            await expect(page).toSelect(selectorVer2Step1.slPortOfArriVal, ver2RandomValuePoA);
-            await expect(page).toClick(selectorVer2Step1.checkVisaFee);
+            //Fill data to input
+            if (slPortOfArriVal) {
+                await expect(page).toSelect(selectorVer2Step1.slPortOfArriVal, ver2RandomValuePoA);
+            }
+            if (checkVisaFee) {
+                await expect(page).toClick(selectorVer2Step1.checkVisaFee);
+            }
             await expect(page).toClick(selectorVer2Step1.orderS1SubmitVer2, { delay: 500 });
             //Step 2a
             await page.waitForNavigation({
@@ -89,21 +97,56 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                     'networkidle2'
                 ]
             });
-            await expect(page).toFill(selectorVer2Step2a.fullName, fullName, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.birthDay, birthdayVer2, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.email, data.email, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.telephone, data.phoneNumber, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.address, `${data.address} ${data.city}`, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.dateOfArrival, dateVer2, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2a.specialRequest, data.specialRequest, { delay: 100 });
+            //Check if elements exit
+            let fullName        = await page.$(selectorVer2Step2a.fullName) || null;
+            let birthDay        = await page.$(selectorVer2Step2a.birthDay) || null;
+            let email           = await page.$(selectorVer2Step2a.email) || null;
+            let telephone       = await page.$(selectorVer2Step2a.telephone) || null;
+            let address         = await page.$(selectorVer2Step2a.address) || null;
+            let dateOfArrival   = await page.$(selectorVer2Step2a.dateOfArrival) || null;
+            let specialRequest  = await page.$(selectorVer2Step2a.specialRequest) || null;
+            let nationality     = await page.$(selectorVer2Step2a.nationality) || null;
+            let typeOfVisa      = await page.$(selectorVer2Step2a.typeOfVisa) || null;
+            let zoneNumber      = await page.$(selectorVer2Step2a.zoneNumber) || null;
+            let methodDirect    = await page.$(selectorVer2Step2a.methodDirect) || null;
+            //Fill data to input
+            if (fullName) {
+                await expect(page).toFill(selectorVer2Step2a.fullName, fullNameInput, { delay: 100 });
+            }
+            if (birthDay) {
+                await expect(page).toFill(selectorVer2Step2a.birthDay, birthdayVer2, { delay: 100 });
+            }
+            if (email) {
+                await expect(page).toFill(selectorVer2Step2a.email, data.email, { delay: 100 });
+            }
+            if (telephone) {
+                await expect(page).toFill(selectorVer2Step2a.telephone, data.phoneNumber, { delay: 100 });
+            }
+            if (address) {
+                await expect(page).toFill(selectorVer2Step2a.address, `${data.address} ${data.city}`, { delay: 100 });
+            }
+            if (dateOfArrival) {
+                await expect(page).toFill(selectorVer2Step2a.dateOfArrival, dateVer2, { delay: 100 });
+            }
+            if (specialRequest) {
+                await expect(page).toFill(selectorVer2Step2a.specialRequest, data.specialRequest, { delay: 100 });
+            }
             await pickRandomValue(selectorVer2Step2a.nationality)
                 .then(data => ver2RandomValueNationality = data);
-            await expect(page).toSelect(selectorVer2Step2a.nationality, ver2RandomValueNationality);
+            if (nationality) {
+                await expect(page).toSelect(selectorVer2Step2a.nationality, ver2RandomValueNationality);
+            }
             await pickRandomValue(selectorVer2Step2a.typeOfVisa)
                 .then(data => ver2RandomValueToV = data);
-            await expect(page).toSelect(selectorVer2Step2a.typeOfVisa, ver2RandomValueToV);
-            await expect(page).toSelect(selectorVer2Step2a.zoneNumber, data.vnCodeAlpha2ISO);
-            await expect(page).toClick(selectorVer2Step2a.methodDirect);
+            if (typeOfVisa) {
+                await expect(page).toSelect(selectorVer2Step2a.typeOfVisa, ver2RandomValueToV);
+            }
+            if (zoneNumber) {
+                await expect(page).toSelect(selectorVer2Step2a.zoneNumber, data.vnCodeAlpha2ISO);
+            }
+            if (methodDirect) {
+                await expect(page).toClick(selectorVer2Step2a.methodDirect);
+            }
             isSendMailNotiDone = 'true';
 
             //step 2b
@@ -111,21 +154,63 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             await page.waitForSelector(selectorVer2Step2b.orderS2Submit, {
                 visible: true
             });
-            await expect(page).toFill(selectorVer2Step2b.billingFirstName, data.firstName, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2b.billingLastName, data.lastName, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2b.billingCity, data.city, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2b.billingAddress, data.address, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2b.cardNumber, data.cardNumber, { delay: 100 });
-            await expect(page).toFill(selectorVer2Step2b.billingCVV2, data.cardCVV, { delay: 100 });
-            await expect(page).toSelect(selectorVer2Step2b.billingCountry, data.vnCodeAlpha2ISO);
-            await expect(page).toSelect(selectorVer2Step2b.billingMonth, currentMonth);
-            await expect(page).toSelect(selectorVer2Step2b.billingYear, currentYear);
-            await expect(page).toClick(selectorVer2Step2b.orderS2Submit);
-            // await page.waitForXPath('/html/body/div/section/div/div/div/div/h1/span');
+            //Check if element exit
+            let billingFirstName    = await page.$(selectorVer2Step2b.billingFirstName) || null;
+            let billingLastName     = await page.$(selectorVer2Step2b.billingLastName) || null;
+            let billingCity         = await page.$(selectorVer2Step2b.billingCity) || null;
+            let billingAddress      = await page.$(selectorVer2Step2b.billingAddress) || null;
+            let cardNumber          = await page.$(selectorVer2Step2b.cardNumber) || null;
+            let billingCVV2         = await page.$(selectorVer2Step2b.billingCVV2) || null;
+            let billingCountry      = await page.$(selectorVer2Step2b.billingCountry) || null;
+            let billingMonth        = await page.$(selectorVer2Step2b.billingMonth) || null;
+            let billingYear         = await page.$(selectorVer2Step2b.billingYear) || null;
+            let orderS2Submit       = await page.$(selectorVer2Step2b.orderS2Submit) || null;
+            //Fill data to input
+            if (billingFirstName) {
+                await expect(page).toFill(selectorVer2Step2b.billingFirstName, data.firstName, { delay: 100 });
+            }
+            if (billingLastName) {
+                await expect(page).toFill(selectorVer2Step2b.billingLastName, data.lastName, { delay: 100 });
+            }
+            if (billingCity) {
+                await expect(page).toFill(selectorVer2Step2b.billingCity, data.city, { delay: 100 });
+            }
+            if (billingAddress) {
+                await expect(page).toFill(selectorVer2Step2b.billingAddress, data.address, { delay: 100 });
+            }
+            if (cardNumber) {
+                await expect(page).toFill(selectorVer2Step2b.cardNumber, data.cardNumber, { delay: 100 });
+            }
+            if (billingCVV2) {
+                await expect(page).toFill(selectorVer2Step2b.billingCVV2, data.cardCVV, { delay: 100 });
+            }
+            if (billingCountry) {
+                await expect(page).toSelect(selectorVer2Step2b.billingCountry, data.vnCodeAlpha2ISO);
+            }
+            if (billingMonth) {
+                await expect(page).toSelect(selectorVer2Step2b.billingMonth, currentMonth);
+            }
+            if (billingYear) {
+                await expect(page).toSelect(selectorVer2Step2b.billingYear, currentYear);
+            }
+            if (orderS2Submit) {
+                await expect(page).toClick(selectorVer2Step2b.orderS2Submit);
+            }
         } else {
 
             //Step 1
-
+            //Check if element exit
+            let dateOfArrival       = await page.$(selectorVer3Step1.dateOfArrival) || null;
+            let specialRequest      = await page.$(selectorVer3Step1.specialRequest) || null;
+            let fullNamePassport    = await page.$(selectorVer3Step1.fullNamePassport) || null;
+            let birthdayPassport    = await page.$(selectorVer3Step1.birthdayPassport) || null;
+            let fullName            = await page.$(selectorVer3Step1.fullName) || null;
+            let email               = await page.$(selectorVer3Step1.email) || null;
+            let telephone           = await page.$(selectorVer3Step1.telephone) || null;
+            let portOfArrival       = await page.$(selectorVer3Step1.portOfArrival) || null;
+            let countryPassport     = await page.$(selectorVer3Step1.countryPassport) || null;
+            let visaTypePassport    = await page.$(selectorVer3Step1.visaTypePassport) || null;
+            let selZoneNumber       = await page.$(selectorVer3Step1.selZoneNumber) || null;
             await pickRandomValue(selectorVer3Step1.portOfArrival)
                 .then(data => randomValuePoA = data);
             await pickRandomValue(selectorVer3Step1.countryPassport)
@@ -134,17 +219,40 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 .then(data => randomValueVTP = data);
             await pickRandomValue(selectorVer3Step1.selZoneNumber)
                 .then(data => randomValueZN = data);
-            await page.type(selectorVer3Step1.dateOfArrival, date, { delay: 100 });
-            await page.type(selectorVer3Step1.specialRequest, data.specialRequest, { delay: 100 });
-            await page.type(selectorVer3Step1.fullNamePassport, `${data.firstName} ${data.lastName}`, { delay: 100 });
-            await page.type(selectorVer3Step1.birthdayPassport, birthday, { delay: 100 });
-            await page.type(selectorVer3Step1.fullName, `${data.firstName} ${data.lastName}`, { delay: 100 });
-            await page.type(selectorVer3Step1.email, data.email, { delay: 100 });
-            await page.type(selectorVer3Step1.telephone, data.phoneNumber, { delay: 100 });
-            await page.select(selectorVer3Step1.portOfArrival, randomValuePoA);
-            await page.select(selectorVer3Step1.countryPassport, randomValueCP);
-            await page.select(selectorVer3Step1.visaTypePassport, randomValueVTP);
-            await page.select(selectorVer3Step1.selZoneNumber, randomValueZN);
+            //Fill data to input
+            if (dateOfArrival) {
+                await page.type(selectorVer3Step1.dateOfArrival, date, { delay: 100 });
+            }
+            if (specialRequest) {
+                await page.type(selectorVer3Step1.specialRequest, data.specialRequest, { delay: 100 });
+            }
+            if (fullNamePassport) {
+                await page.type(selectorVer3Step1.fullNamePassport, `${data.firstName} ${data.lastName}`, { delay: 100 });
+            }
+            if (birthdayPassport) {
+                 await page.type(selectorVer3Step1.birthdayPassport, birthday, { delay: 100 });
+            }
+            if (fullName) {
+                await page.type(selectorVer3Step1.fullName, `${data.firstName} ${data.lastName}`, { delay: 100 });
+            }
+            if (email) {
+                await page.type(selectorVer3Step1.email, data.email, { delay: 100 });
+            }
+            if (telephone) {
+                await page.type(selectorVer3Step1.telephone, data.phoneNumber, { delay: 100 });
+            }
+            if (portOfArrival) {
+                await page.select(selectorVer3Step1.portOfArrival, randomValuePoA);
+            }
+            if (countryPassport) {
+                await page.select(selectorVer3Step1.countryPassport, randomValueCP);
+            }
+            if (visaTypePassport) {
+                await page.select(selectorVer3Step1.visaTypePassport, randomValueVTP);
+            }
+            if (selZoneNumber) {
+                await page.select(selectorVer3Step1.selZoneNumber, randomValueZN);
+            }
             await page.click(selectorVer3Step1.orderS1Submit);
             isSendMailNotiDone = 'true';
 
@@ -175,6 +283,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 'networkidle2'
             ]
         });
+
         await page.waitForNavigation({
             waitUntil: [
                 'load',
@@ -207,7 +316,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
         //Loop 3 time if TimeoutError
     });
     for (const url of urls.urls) {
-        cluster.queue(`${url}/apply-visa`);
+        cluster.queue(url);
     }
     while (true){
         countIsCloseDontBreak++;
@@ -230,4 +339,4 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
 
     // many more pages
 };
-exports.runAutomationTest   = runAutomationTest;
+exports.runAutomationTest = runAutomationTest;
