@@ -6,7 +6,7 @@ const FileSync                              = require('lowdb/adapters/FileSync')
 const adapter                               = new FileSync('db.json');
 const { runAutomationTest }                 = require('./index');
 const app                                   = express();
-const port                                  = 3000;
+const port                                  = 3001;
 let urls;
 
 app.use(cors());

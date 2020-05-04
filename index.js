@@ -4,7 +4,8 @@ const expect                = require('expect-puppeteer');
 const faker                 = require('faker');
 require('dotenv').config();
 const urls                  = require('./server');
-const selectorVer2Step1     = require('./selector/ver2/step1');
+const { step1 }     = require('./selector/ver2/step1');
+const configStep1 = step1();
 const selectorVer2Step2a    = require('./selector/ver2/step2a');
 const selectorVer2Step2b    = require('./selector/ver2/step2b');
 const selectorVer3Step1     = require('./selector/ver3/step1');
@@ -71,11 +72,11 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             return arrValue[Math.floor(Math.random() * arrValue.length)];
         };
 
-        isVer2 = await page.$(selectorVer2Step1.slNumberOfVisa) || null;
+        isVer2 = await page.$(configStep1[0].selector) || null;
         if (isVer2) {
             //Step 1
             //Check if elements exit
-            let slPortOfArriVal = await page.$(selectorVer2Step1.slPortOfArriVal) || null;
+            /*let slPortOfArriVal = await page.$(selectorVer2Step1.slPortOfArriVal) || null;
             let checkVisaFee    = await page.$(selectorVer2Step1.checkVisaFee) || null;
 
             await pickRandomValue(selectorVer2Step1.slPortOfArriVal)
@@ -87,7 +88,29 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             if (checkVisaFee) {
                 await expect(page).toClick(selectorVer2Step1.checkVisaFee);
             }
-            await expect(page).toClick(selectorVer2Step1.orderS1SubmitVer2, { delay: 500 });
+            await expect(page).toClick(selectorVer2Step1.orderS1SubmitVer2, { delay: 500 });*/
+
+            await configStep1.forEach(async function (config, index) {
+                if(config.type == 'SELECT'){
+                    await expect(page).toSelect(config.selector, config.value);
+                }else if(config.type == 'RADIO'){
+                    await expect(page).toClick(config.selector + '[value='+ config.value +']');
+                }else if(config.type == 'BUTTON'){
+                    await expect(page).toClick(config.selector, { delay: 500 });
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+
             //Step 2a
             await page.waitForNavigation({
                 waitUntil: [
