@@ -1,7 +1,8 @@
 const puppeteer             = require('puppeteer');
 const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
-const data                  = require('./input/data');
+const faker                 = require('faker');
+require('dotenv').config();
 const urls                  = require('./server');
 const selectorVer2Step1     = require('./selector/ver2/step1');
 const selectorVer2Step2a    = require('./selector/ver2/step2a');
@@ -25,7 +26,6 @@ let isSendMailNotiDone,
     orderDone;
 
 
-let fullNameInput       = `${data.firstName} ${data.lastName}`;
 let today               = new Date();
 let currentDate         = today.getDate();
 today.setDate(currentDate + 4);
@@ -110,26 +110,27 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             let zoneNumber      = await page.$(selectorVer2Step2a.zoneNumber) || null;
             let methodDirect    = await page.$(selectorVer2Step2a.methodDirect) || null;
             //Fill data to input
+
             if (fullName) {
-                await expect(page).toFill(selectorVer2Step2a.fullName, fullNameInput, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2a.fullName, process.env.CONTACT_FULL_NAME, { delay: 100 });
             }
             if (birthDay) {
                 await expect(page).toFill(selectorVer2Step2a.birthDay, birthdayVer2, { delay: 100 });
             }
             if (email) {
-                await expect(page).toFill(selectorVer2Step2a.email, data.email, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2a.email, process.env.CONTACT_EMAIL, { delay: 100 });
             }
             if (telephone) {
-                await expect(page).toFill(selectorVer2Step2a.telephone, data.phoneNumber, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2a.telephone, faker.phone.phoneNumber(), { delay: 100 });
             }
             if (address) {
-                await expect(page).toFill(selectorVer2Step2a.address, `${data.address} ${data.city}`, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2a.address, `${faker.address.streetAddress()},${faker.address.streetName()},${faker.address.state()},${faker.address.city()}`, { delay: 100 });
             }
             if (dateOfArrival) {
                 await expect(page).toFill(selectorVer2Step2a.dateOfArrival, dateVer2, { delay: 100 });
             }
             if (specialRequest) {
-                await expect(page).toFill(selectorVer2Step2a.specialRequest, data.specialRequest, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2a.specialRequest, faker.lorem.sentence(), { delay: 100 });
             }
             await pickRandomValue(selectorVer2Step2a.nationality)
                 .then(data => ver2RandomValueNationality = data);
@@ -142,7 +143,7 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 await expect(page).toSelect(selectorVer2Step2a.typeOfVisa, ver2RandomValueToV);
             }
             if (zoneNumber) {
-                await expect(page).toSelect(selectorVer2Step2a.zoneNumber, data.vnCodeAlpha2ISO);
+                await expect(page).toSelect(selectorVer2Step2a.zoneNumber, process.env.CONTACT_VN_CODE_STRING);
             }
             if (methodDirect) {
                 await expect(page).toClick(selectorVer2Step2a.methodDirect);
@@ -167,25 +168,25 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             let orderS2Submit       = await page.$(selectorVer2Step2b.orderS2Submit) || null;
             //Fill data to input
             if (billingFirstName) {
-                await expect(page).toFill(selectorVer2Step2b.billingFirstName, data.firstName, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.billingFirstName, faker.name.firstName(), { delay: 100 });
             }
             if (billingLastName) {
-                await expect(page).toFill(selectorVer2Step2b.billingLastName, data.lastName, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.billingLastName, faker.name.lastName(), { delay: 100 });
             }
             if (billingCity) {
-                await expect(page).toFill(selectorVer2Step2b.billingCity, data.city, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.billingCity, faker.address.city(), { delay: 100 });
             }
             if (billingAddress) {
-                await expect(page).toFill(selectorVer2Step2b.billingAddress, data.address, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.billingAddress, `${faker.address.streetAddress()}, ${faker.address.streetName()}, ${faker.address.state()}`, { delay: 100 });
             }
             if (cardNumber) {
-                await expect(page).toFill(selectorVer2Step2b.cardNumber, data.cardNumber, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.cardNumber, process.env.CONTACT_CARD_NUMBER, { delay: 100 });
             }
             if (billingCVV2) {
-                await expect(page).toFill(selectorVer2Step2b.billingCVV2, data.cardCVV, { delay: 100 });
+                await expect(page).toFill(selectorVer2Step2b.billingCVV2, process.env.CONTACT_CARD_CVV, { delay: 100 });
             }
             if (billingCountry) {
-                await expect(page).toSelect(selectorVer2Step2b.billingCountry, data.vnCodeAlpha2ISO);
+                await expect(page).toSelect(selectorVer2Step2b.billingCountry, process.env.CONTACT_VN_CODE_STRING);
             }
             if (billingMonth) {
                 await expect(page).toSelect(selectorVer2Step2b.billingMonth, currentMonth);
@@ -224,22 +225,22 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
                 await page.type(selectorVer3Step1.dateOfArrival, date, { delay: 100 });
             }
             if (specialRequest) {
-                await page.type(selectorVer3Step1.specialRequest, data.specialRequest, { delay: 100 });
+                await page.type(selectorVer3Step1.specialRequest, faker.lorem.sentence(), { delay: 100 });
             }
             if (fullNamePassport) {
-                await page.type(selectorVer3Step1.fullNamePassport, `${data.firstName} ${data.lastName}`, { delay: 100 });
+                await page.type(selectorVer3Step1.fullNamePassport, `${faker.name.firstName()} ${faker.name.lastName()}`, { delay: 100 });
             }
             if (birthdayPassport) {
                  await page.type(selectorVer3Step1.birthdayPassport, birthday, { delay: 100 });
             }
             if (fullName) {
-                await page.type(selectorVer3Step1.fullName, `${data.firstName} ${data.lastName}`, { delay: 100 });
+                await page.type(selectorVer3Step1.fullName, process.env.CONTACT_FULL_NAME, { delay: 100 });
             }
             if (email) {
-                await page.type(selectorVer3Step1.email, data.email, { delay: 100 });
+                await page.type(selectorVer3Step1.email, process.env.CONTACT_EMAIL, { delay: 100 });
             }
             if (telephone) {
-                await page.type(selectorVer3Step1.telephone, data.phoneNumber, { delay: 100 });
+                await page.type(selectorVer3Step1.telephone, faker.phone.phoneNumber(), { delay: 100 });
             }
             if (portOfArrival) {
                 await page.select(selectorVer3Step1.portOfArrival, randomValuePoA);
@@ -264,15 +265,15 @@ let runAutomationTest = async () => {//Immediately Invoked Function Expression (
             await page.waitForSelector(selectorVer3Step2.cardCVV, {visible: true});
             await page.waitForSelector(selectorVer3Step2.orderS2Submit, {visible: true});
 
-            await page.type(selectorVer3Step2.firstName, data.firstName, { delay: 100 });
-            await page.type(selectorVer3Step2.lastName, data.lastName, { delay: 100 });
-            await page.type(selectorVer3Step2.city, data.city, { delay: 100 });
-            await page.type(selectorVer3Step2.address, data.address, { delay: 100 });
-            await page.type(selectorVer3Step2.cardNumber, data.cardNumber, { delay: 100 });
+            await page.type(selectorVer3Step2.firstName, faker.name.firstName(), { delay: 100 });
+            await page.type(selectorVer3Step2.lastName, faker.name.lastName(), { delay: 100 });
+            await page.type(selectorVer3Step2.city, faker.address.city(), { delay: 100 });
+            await page.type(selectorVer3Step2.address, `${faker.address.streetAddress()}, ${faker.address.streetName()}, ${faker.address.state()}`, { delay: 100 });
+            await page.type(selectorVer3Step2.cardNumber, process.env.CONTACT_CARD_NUMBER, { delay: 100 });
             await page.type(selectorVer3Step2.cardMonth, currentMonth, { delay: 100 });
             await page.type(selectorVer3Step2.cardYear, currentYear, { delay: 100 });
-            await page.type(selectorVer3Step2.cardCVV, data.cardCVV, { delay: 100 });
-            await page.select(selectorVer3Step2.countryOfResidence, data.vnCodeAlpha2ISO);
+            await page.type(selectorVer3Step2.cardCVV, process.env.CONTACT_CARD_CVV, { delay: 100 });
+            await page.select(selectorVer3Step2.countryOfResidence, process.env.CONTACT_VN_CODE_STRING);
             await page.click(selectorVer3Step2.orderS2Submit);
         }
         await page.waitForNavigation({
