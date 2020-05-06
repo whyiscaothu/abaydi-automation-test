@@ -1,13 +1,13 @@
 module.exports = {
-    step1: function(){
+    ver2Step1: function () {
         return [
             {
                 selector: '#slNumberOfVisa',
-                type: 'SELECT',
-                value: '2'
+                type: 'CheckVer',
+                value: null
             },
             {
-                selector: '.transportation-method',
+                selector: '[name="chkMethod"]',
                 type: 'RADIO',
                 value: 'airport'
             },
@@ -26,6 +26,6 @@ module.exports = {
                 type: 'BUTTON',
                 value: ''
             },
-        ];
+        ]
     }
-};
+}

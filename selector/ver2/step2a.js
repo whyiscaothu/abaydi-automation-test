@@ -1,16 +1,79 @@
+require('dotenv').config();
+const faker   = require('faker');
+const getTime = require('../../get-time')
 
-// Step 2
-//https://www.domain.xyz/apply-visa/payment
-exports.fullName        = '#txtFullName0';
-exports.birthDay        = '#txtbirthDay0';
-exports.nationality     = '#slNationality0';
-exports.typeOfVisa      = '#slTypeVisa0';
-exports.email           = '#txtEmail';
-exports.zoneNumber      = '#selZoneNumber';
-exports.telephone       = '#txtTelephone';
-exports.address         = '#txtAddress';
-exports.dateOfArrival   = '#txtDateOfArrival';
-exports.specialRequest  = '#txtSpecialRequest';
-exports.methodDirect    = '#radMethodDirect';
+module.exports = {
+    ver2Step2a: function () {
+        return [
+            {
+                name: 'Full Name',
+                selector: '#txtFullName0',
+                type: 'TEXT',
+                value: process.env['CONTACT_FULL_NAME']
+            },
+            {
+                name: 'Date of Birth',
+                selector: '#txtbirthDay0',
+                type: 'TEXT',
+                value: getTime.birthdayVer2
+            },
+            {
+                name: 'Email',
+                selector: '#txtEmail',
+                type: 'TEXT',
+                value: process.env['CONTACT_EMAIL']
+            },
+            {
+                name: 'Telephone',
+                selector: '#txtTelephone',
+                type: 'TEXT',
+                value: faker.phone.phoneNumber()
+            },
+            {
+                name: 'Address',
+                selector: '#txtAddress',
+                type: 'TEXT',
+                value: `${faker.address.streetAddress()}, ${faker.address.streetName()}, ${faker.address.state()}, ${faker.address.city()}`
+            },
+            {
+                name: 'Date Of Arrival',
+                selector: '#txtDateOfArrival',
+                type: 'TEXT',
+                value: getTime.dateVer2
+            },
+            {
+                name: 'Special Request',
+                selector: '#txtSpecialRequest',
+                type: 'TEXT',
+                value: process.env['CONTACT_FULL_NAME']
+            },
+            {
+                name: 'Telephone',
+                selector: '#selZoneNumber',
+                type: 'SELECT',
+                value: process.env['CONTACT_VN_CODE_STRING']
+            },
+            {
+                name: 'Nationality',
+                selector: '#slNationality0',
+                type: 'SELECT',
+                value: '253'
+            },
+            {
+                name: 'Type of Visa',
+                selector: '#slTypeVisa0',
+                type: 'SELECT',
+                value: '3'
+            },
+            {
+                name: 'Credit / Debit Card',
+                selector: '#radMethodDirect',
+                type: 'RADIO',
+                value: ''
+            },
+
+        ]
+    }
+}
 
 
