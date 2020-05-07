@@ -5,12 +5,12 @@ const getTime = require('../../get-time')
 module.exports = {
     ver3Step2: function () {
         return [
-            {
-                name: 'Credit/ Debit Card',
-                selector: '#chkPayMethodCredit',
-                type: 'RADIO',
-                value: null
-            },
+            // {
+            //     name: 'Credit/ Debit Card',
+            //     selector: '#chkPayMethodCredit',
+            //     type: 'RADIO',
+            //     value: null
+            // },
             {
                 name: 'First Name',
                 selector: '#txtFirstName',

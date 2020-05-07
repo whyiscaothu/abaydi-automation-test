@@ -39,7 +39,7 @@ module.exports = {
                 name: 'Full Name',
                 selector: '#txtFullName_0',
                 type: 'TEXT',
-                value: `${faker.name.firstName()} ${faker.name.lastName()}`
+                value: process.env['CONTACT_FULL_NAME']
             },
             {
                 name: 'Date of Birth',
@@ -69,7 +69,7 @@ module.exports = {
                 name: 'Full Name',
                 selector: '#txtFullNameContact',
                 type: 'TEXT',
-                value: `${faker.name.firstName()} ${faker.name.lastName()}`
+                value: process.env['CONTACT_FULL_NAME']
             },
             {
                 name: 'Email Address',
