@@ -74,35 +74,29 @@ let runAutomationTest = async () => {
             for await (const item of selectorVer2Step1) {
                 switch (item.type) {
                     case "SELECT":
-                        await expect(page).toSelect(item.selector, item.value);
+                        await page.select(item.selector, item.value);
                         break;
                     case "RADIO":
-                        await expect(page).toClick(item.selector);
-                        break;
                     case "BUTTON":
-                        await expect(page).toClick(item.selector, { delay: 500 });
+                        await page.click(item.selector, { delay: 500 });
                         break;
                 }
             }
             //Step 2a
-            await page.waitForNavigation({
-                waitUntil: [
-                    'load',
-                    'domcontentloaded',
-                    'networkidle0',
-                    'networkidle2'
-                ]
-            });
             for await (const item of selectorVer2Step2a) {
-                switch (item.type) {
+                await page.waitForSelector(item.selector);
+            }
+            for await (const item of selectorVer2Step2a) {
+                switch(item.type) {
                     case "TEXT":
-                        await expect(page).toFill(item.selector, item.value, { delay: 100 });
+                        await page.type(item.selector, item.value, { delay: 100 });
                         break;
                     case "SELECT":
-                        await expect(page).toSelect(item.selector, item.value);
+                        await page.select(item.selector, item.value);
                         break;
                     case "RADIO":
-                        await expect(page).toClick(item.selector);
+                    case "BUTTON":
+                        await page.click(item.selector);
                         break;
                 }
             }
@@ -115,29 +109,30 @@ let runAutomationTest = async () => {
             for await (const item of selectorVer2Step2b) {
                 switch (item.type) {
                     case "TEXT":
-                        await expect(page).toFill(item.selector, item.value, { delay: 100 });
+                        await page.type(item.selector, item.value, { delay: 100 });
                         break;
                     case "SELECT":
-                        await expect(page).toSelect(item.selector, item.value);
+                        await page.select(item.selector, item.value);
                         break;
                     case "BUTTON":
-                        await expect(page).toClick(item.selector);
+                        await page.click(item.selector);
                         break;
                 }
             }
-        } else {
+        } else { //Ver 3 & Ver 4
             //Step 1
             for await (const item of selectorVer3Step1) {
                 switch (item.type) {
                     case "TEXT":
-                        await expect(page).toFill(item.selector, item.value, { delay: 100 });
+                        await page.type(item.selector, item.value, { delay: 100 });
+                        // await expect(page).toFill(item.selector, item.value, { delay: 100 });
                         break;
                     case "SELECT":
-                        await expect(page).toSelect(item.selector, item.value);
+                        await page.select(item.selector, item.value);
                         break;
-                    // case "RADIO":
+                    case "RADIO":
                     case "BUTTON":
-                        await expect(page).toClick(item.selector);
+                        await page.click(item.selector);
                         break;
                 }
             }
@@ -158,14 +153,14 @@ let runAutomationTest = async () => {
             for await (const item of selectorVer3Step2) {
                 switch (item.type) {
                     case "TEXT":
-                        await expect(page).toFill(item.selector, item.value, { delay: 100 });
+                        await page.type(item.selector, item.value, { delay: 100 });
                         break;
                     case "SELECT":
-                        await expect(page).toSelect(item.selector, item.value);
+                        await page.select(item.selector, item.value);
                         break;
                     case "RADIO":
                     case "BUTTON":
-                        await expect(page).toClick(item.selector);
+                        await page.click(item.selector);
                         break;
                 }
             }
