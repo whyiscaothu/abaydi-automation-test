@@ -25,9 +25,9 @@ const FOLDER_NAME_INPUT = "input";
                 // crawl content from file
                 const ARR_SITE = [];
                 for (let i=0; i<arr_file.length; i++){
-                    var marketplace = arr_file[i].substring(0, arr_file[i].length - 5);
+                    let marketplace = arr_file[i].substring(0, arr_file[i].length - 5);
 
-                    var result_html = await fs.readFileSync(__dirname + "\\" + FOLDER_NAME_INPUT + "\\" + arr_file[i], 'utf8');
+                    let result_html = await fs.readFileSync(__dirname + "\\" + FOLDER_NAME_INPUT + "\\" + arr_file[i], 'utf8');
                     result_html = result_html.match(/<table[^>]*>[\s\S]*<\/table>/gi) + "";
 
                     await page.setContent(result_html);
@@ -35,8 +35,8 @@ const FOLDER_NAME_INPUT = "input";
                         let arr_site = [];
                         let tbody = document.getElementsByTagName('tbody')[0];
                         for (let j=1; j<tbody.childElementCount; j++){
-                            var tr = tbody.children[j];
-                            var td = tr.querySelectorAll('td:not(.freezebar-cell)');
+                            let tr = tbody.children[j];
+                            let td = tr.querySelectorAll('td:not(.freezebar-cell)');
                             if(td.length > 4){
                                 let active = td[3].innerText.trim().toLowerCase();
                                 if(active === 'active'){

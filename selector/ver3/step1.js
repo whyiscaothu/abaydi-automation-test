@@ -39,7 +39,7 @@ module.exports = {
                 name: 'Full Name',
                 selector: '#txtFullName_0',
                 type: 'TEXT',
-                value: process.env['CONTACT_FULL_NAME']
+                value: `${faker.name.firstName()} ${faker.name.lastName()}`
             },
             {
                 name: 'Date of Birth',

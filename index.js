@@ -1,7 +1,6 @@
 const puppeteer             = require('puppeteer');
 const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
-const faker                 = require('faker');
 require('dotenv').config();
 const urls                  = require('./server');
 const { ver2Step1 }         = require('./selector/ver2/step1');
