@@ -1,3 +1,10 @@
+/*
+ * 1. Export các sheet có trong https://docs.google.com/spreadsheets/d/1y00p1pHJ-e_54hablRZja-C8ZZHQYyHwsp6vUw3F5_U/edit : File -> Download as -> Web page (.html, zipped)
+ * 2. Giải nén thư mực vừa download về và copy tất cả các file .html vào thư mục input của project. VD: input/Azer.html, input/Bahrain.html, ...
+ * 3. Chạy lệnh: node get-domains
+ * 4. File domains.json được trả ra ở thư mục gốc
+ */
+
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
