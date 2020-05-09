@@ -11,18 +11,6 @@ module.exports = {
                 type: 'TEXT',
                 value: getTime.date
             },
-            // {
-            //     name: 'Transportation Method',
-            //     selector: '[name="chkMethod"]',
-            //     type: 'RADIO',
-            //     value: null
-            // },
-            {
-                name: 'Port of Arrival',
-                selector: '#selPortOfArrival',
-                type: 'SELECT',
-                value: '2'
-            },
             {
                 name: 'Special Request',
                 selector: '[name="txtSpecialRequest"]',
@@ -46,12 +34,6 @@ module.exports = {
                 selector: '#drpCountry_0',
                 type: 'SELECT',
                 value: '___RANDOM___'
-            },
-            {
-                name: 'Type of Visa',
-                selector: '#selVisaType_0',
-                type: 'SELECT',
-                value: '2'
             },
             {
                 name: 'Full Name',

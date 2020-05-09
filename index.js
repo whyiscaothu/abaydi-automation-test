@@ -127,14 +127,18 @@ let runAutomationTest = async () => {
 
 
             for await (const item of selectorVer2Step1) {
-                switch (item.type) {
-                    case "SELECT":
-                        await page.select(item.selector, item.value);
-                        break;
-                    case "RADIO":
-                    case "BUTTON":
-                        await page.click(item.selector, { delay: 500 });
-                        break;
+                //Check element is present
+                let isPresent = await page.$(item.selector) || null;
+                if (isPresent) {
+                    switch (item.type) {
+                        case "SELECT":
+                            await page.select(item.selector, item.value);
+                            break;
+                        case "RADIO":
+                        case "BUTTON":
+                            await page.click(item.selector, { delay: 500 });
+                            break;
+                    }
                 }
             }
             //Step 2a
@@ -142,17 +146,20 @@ let runAutomationTest = async () => {
                 await page.waitForSelector(item.selector);
             }
             for await (const item of selectorVer2Step2a) {
-                switch(item.type) {
-                    case "TEXT":
-                        await page.type(item.selector, item.value, { delay: 100 });
-                        break;
-                    case "SELECT":
-                        await page.select(item.selector, item.value);
-                        break;
-                    case "RADIO":
-                    case "BUTTON":
-                        await page.click(item.selector);
-                        break;
+                let isPresent = await page.$(item.selector) || null;
+                if (isPresent) {
+                    switch(item.type) {
+                        case "TEXT":
+                            await page.type(item.selector, item.value, { delay: 100 });
+                            break;
+                        case "SELECT":
+                            await page.select(item.selector, item.value);
+                            break;
+                        case "RADIO":
+                        case "BUTTON":
+                            await page.click(item.selector);
+                            break;
+                    }
                 }
             }
             isSendMailNotiDone = 'true';
@@ -162,61 +169,76 @@ let runAutomationTest = async () => {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
             for await (const item of selectorVer2Step2b) {
-                switch (item.type) {
-                    case "TEXT":
-                        await page.type(item.selector, item.value, { delay: 100 });
-                        break;
-                    case "SELECT":
-                        await page.select(item.selector, item.value);
-                        break;
-                    case "BUTTON":
-                        await page.click(item.selector);
-                        break;
+                let isPresent = await page.$(item.selector) || null;
+                if (isPresent) {
+                    switch (item.type) {
+                        case "TEXT":
+                            await page.type(item.selector, item.value, { delay: 100 });
+                            break;
+                        case "SELECT":
+                            await page.select(item.selector, item.value);
+                            break;
+                        case "BUTTON":
+                            await page.click(item.selector);
+                            break;
+                    }
                 }
             }
         } else { //Ver 3 & Ver 4
             //Step 1
             for await (const item of selectorVer3Step1) {
-                switch (item.type) {
-                    case "TEXT":
-                        await page.type(item.selector, item.value, { delay: 100 });
-                        // await expect(page).toFill(item.selector, item.value, { delay: 100 });
-                        break;
-                    case "SELECT":
-                        await page.select(item.selector, item.value);
-                        break;
-                    case "RADIO":
-                    case "BUTTON":
-                        await page.click(item.selector);
-                        break;
+                let isPresent = await page.$(item.selector) || null;
+                if (isPresent) {
+                    switch (item.type) {
+                        case "TEXT":
+                            await page.type(item.selector, item.value, { delay: 100 });
+                            // await expect(page).toFill(item.selector, item.value, { delay: 100 });
+                            break;
+                        case "SELECT":
+                            let valueForSelect = '';
+                            if(item.value === '___RANDOM___'){
+                                valueForSelect = await pickRandomValue(item.selector)
+                                    .then(data => data);
+                            }else{
+                                valueForSelect = item.value;
+                            }
+                            await page.select(item.selector, valueForSelect);
+                            break;
+                        case "RADIO":
+                        case "BUTTON":
+                            await page.click(item.selector);
+                            break;
+                    }
                 }
             }
-/*            await pickRandomValue(selectorVer3Step1.portOfArrival)
-                .then(data => randomValuePoA = data);
-            await pickRandomValue(selectorVer3Step1.countryPassport)
-                .then(data => randomValueCP = data);
-            await pickRandomValue(selectorVer3Step1.visaTypePassport)
-                .then(data => randomValueVTP = data);
-            await pickRandomValue(selectorVer3Step1.selZoneNumber)
-                .then(data => randomValueZN = data);
-            isSendMailNotiDone = 'true';*/
+            isSendMailNotiDone = 'true';
 
             //Step 2
             for await (const waitFor of selectorVer3Step2) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
             for await (const item of selectorVer3Step2) {
-                switch (item.type) {
-                    case "TEXT":
-                        await page.type(item.selector, item.value, { delay: 100 });
-                        break;
-                    case "SELECT":
-                        await page.select(item.selector, item.value);
-                        break;
-                    case "RADIO":
-                    case "BUTTON":
-                        await page.click(item.selector);
-                        break;
+                let isPresent = await page.$(item.selector) || null;
+                if (isPresent) {
+                    switch (item.type) {
+                        case "TEXT":
+                            await page.type(item.selector, item.value, { delay: 100 });
+                            break;
+                        case "SELECT":
+                            let valueForSelect = '';
+                            if(item.value === '___RANDOM___'){
+                                valueForSelect = await pickRandomValue(item.selector)
+                                    .then(data => data);
+                            }else{
+                                valueForSelect = item.value;
+                            }
+                            await page.select(item.selector, valueForSelect);
+                            break;
+                        case "RADIO":
+                        case "BUTTON":
+                            await page.click(item.selector);
+                            break;
+                    }
                 }
             }
         }
