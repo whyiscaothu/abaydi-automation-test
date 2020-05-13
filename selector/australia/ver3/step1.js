@@ -39,7 +39,7 @@ module.exports = {
                 name: 'Full Name',
                 selector: '#txtFullNameContact',
                 type: 'TEXT',
-                value: process.env['CONTACT_FULL_NAME']
+                value: process.env['IT_TEST']
             },
             {
                 name: 'Email Address',

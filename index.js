@@ -2,7 +2,7 @@ const puppeteer             = require('puppeteer');
 const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
 require('dotenv').config();
-const urls                  = require('./server');
+const dataSubmit            = require('./server');
 const { ver2Step1 }         = require('./selector/ver2/step1');
 const { ver2Step2a }        = require('./selector/ver2/step2a');
 const { ver2Step2b }        = require('./selector/ver2/step2b');
@@ -66,20 +66,9 @@ let NETWORK_PRESETS = {
 }
 
 expect.setDefaultOptions({ timeout: 15000 });
-let countIsCloseDontBreak;
-let isVer2,
-    ver2RandomValuePoA,
-    ver2RandomValueToV,
-    ver2RandomValueNationality;
-let randomValuePoA, //portOfArrival
-    randomValueCP,  //countryPassport
-    randomValueVTP, //visaTypePassport
-    randomValueZN;  //selZoneNumber
 let isSendMailNotiDone,
     isSendMailFailDone,
     orderDone;
-
-
 
 let runAutomationTest = async () => {
     const cluster = await Cluster.launch({
@@ -93,8 +82,14 @@ let runAutomationTest = async () => {
         monitor: true,
     });
 
-    await cluster.task(async ({ page, data: url }) => {
-        await page.goto(url,{
+    await cluster.task(async ({ page, data: item }) => {
+    /*  item: {
+            url: "https://www.cambodiavisagov.asia/apply-visa",
+            name: "cambodiavisagov.asia",
+            marketplace: "Cambodia",
+            version: "2.1" || "2.2" || "3.0" || "4.0"
+        }*/
+        await page.goto(item.url,{
             waitUntil: [
                 'load',
                 'domcontentloaded',
@@ -102,10 +97,8 @@ let runAutomationTest = async () => {
                 'networkidle2'
             ]
         });
-
         // Connect to Chrome DevTools
         const client = await page.target().createCDPSession();
-
         // Set throttling property
         await client.send('Network.emulateNetworkConditions', NETWORK_PRESETS.WiFi);
 
@@ -118,14 +111,19 @@ let runAutomationTest = async () => {
             await arrValue.shift();//Remove first option in select tag.
             return arrValue[Math.floor(Math.random() * arrValue.length)];
         };
-        isVer2 = await page.$(selectorVer2Step1[0].selector) || null;
-        if (isVer2) {
+        let version = item.version;
+        switch (version) {
+            case '2.1':
+            case '2.2':
+                version = '2.0';
+                break;
+            case '3.0':
+            case '4.0':
+                version = '3 or 4';
+                break;
+        }
+        if (version === '2.0') {
             //Step 1
-            //
-            // await pickRandomValue(selectorVer2Step1.slPortOfArriVal)
-            //     .then(data => ver2RandomValuePoA = data);
-
-
             for await (const item of selectorVer2Step1) {
                 //Check element is present
                 let isPresent = await page.$(item.selector) || null;
@@ -184,7 +182,7 @@ let runAutomationTest = async () => {
                     }
                 }
             }
-        } else { //Ver 3 & Ver 4
+        } else if (version === '3 or 4'){
             //Step 1
             for await (const item of selectorVer3Step1) {
                 let isPresent = await page.$(item.selector) || null;
@@ -262,49 +260,44 @@ let runAutomationTest = async () => {
         });
         isSendMailFailDone  = 'true';
         orderDone           = 'true';
-        //Send data to server.js(expressJS)
-        exports.testProgress = {
-            isSendMailNotiDone,
-            isSendMailFailDone,
-            orderDone,
-        };
         // Event handler to be called in case of problems
-        cluster.on('taskerror', (err, data) => {
-            //In case of problem push error link back to urls array.
-            urls.urls.push(data);
-            exports.testProgress = {
-                isSendMailNotiDone,
-                isSendMailFailDone,
-                orderDone,
-            };
-        });
-
-
-
-        //Loop 3 time if TimeoutError
+        // cluster.on('taskerror', (err, data) => {
+        //     //In case of problem push error link back to urls array.
+        //     urls.urls.push(data);
+        //     exports.testProgress = {
+        //         isSendMailNotiDone,
+        //         isSendMailFailDone,
+        //         orderDone,
+        //     };
+        // });
     });
-    for (const url of urls.urls) {
-        cluster.queue(url);
-    }
-    while (true){
-        countIsCloseDontBreak++;
-        try {
-            await cluster.idle();
-            await cluster.close();
-            break;
-        } catch (err) {
-            if (err instanceof puppeteer.errors.TimeoutError) {
-                // Do something if this is a timeout.
-                await cluster.idle();
-                await cluster.close();
-                break;
-            }
-            if (countIsCloseDontBreak >= 3){
-                throw new Error(`${err} loop 3 time`)
-            }
+    for (let item of dataSubmit.dataSubmit) {
+        if (item.run_order) {
+            await cluster.queue({
+                url: `https://www.${item.name}/apply-visa`,
+                name: item.name.replace(/\./g, ''),
+                marketplace: item.marketplace,
+                version: item.version,
+            });
+        }
+        if (item.run_payment) {
+            await cluster.queue({
+                url: `https://www.${item.name}/make-payment`,
+                name: item.name.replace(/\./g, ''),
+                marketplace: item.marketplace,
+                version: item.version,
+            });
+        }
+        if (item.run_contact) {
+            await cluster.queue({
+                url: `https://www.${item.name}/contact-us`,
+                name: item.name.replace(/\./g, ''),
+                marketplace: item.marketplace,
+                version: item.version,
+            });
         }
     }
-
-    // many more pages
+    await cluster.idle();
+    await cluster.close();
 };
 exports.runAutomationTest = runAutomationTest;

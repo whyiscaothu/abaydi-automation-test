@@ -5,26 +5,23 @@ const bodyParser                            = require('body-parser');
 const { runAutomationTest }                 = require('./index');
 const app                                   = express();
 const port                                  = 3000;
-let urls;
+let dataSubmit;
 
 app.use(cors());
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-
-
 app.get('/', (req, res) => {
     res.send('ok');
 });
 
-app.post('/urls',(req, res) => {
-    urls = req.body.urls;
-    module.exports.urls = urls;
+app.post('/data-submit',(req, res) => {
+    dataSubmit = req.body.dataSubmit;
+    module.exports.dataSubmit = dataSubmit; //pass to index.js
 
     runAutomationTest().catch(err => console.log(err));
     res.redirect('/');
 });
-
 app.post('/domains',(req, res) => {
     const data = fs.readFileSync('./domains.json', {
         encoding:'utf8',

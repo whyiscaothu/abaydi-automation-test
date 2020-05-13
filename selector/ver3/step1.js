@@ -21,13 +21,13 @@ module.exports = {
                 name: 'Port of Arrival',
                 selector: '#selPortOfArrival',
                 type: 'SELECT',
-                value: '2'
+                value: '___RANDOM___'
             },
             {
                 name: 'Special Request',
                 selector: '[name="txtSpecialRequest"]',
                 type: 'TEXT',
-                value: faker.lorem.sentence()
+                value: process.env['IT_TEST']
             },
             {
                 name: 'Full Name',
@@ -51,13 +51,13 @@ module.exports = {
                 name: 'Type of Visa',
                 selector: '#selVisaType_0',
                 type: 'SELECT',
-                value: '2'
+                value: '___RANDOM___'
             },
             {
                 name: 'Full Name',
                 selector: '#txtFullNameContact',
                 type: 'TEXT',
-                value: process.env['CONTACT_FULL_NAME']
+                value: process.env['IT_TEST']
             },
             {
                 name: 'Email Address',
@@ -69,7 +69,7 @@ module.exports = {
                 name: 'Mobile/Cell Telephone',
                 selector: '#selZoneNumber',
                 type: 'SELECT',
-                value: process.env['CONTACT_VN_CODE_STRING']
+                value: '___RANDOM___'
             },
             {
                 name: 'Mobile/Cell Telephone',

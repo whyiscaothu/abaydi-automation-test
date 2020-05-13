@@ -9,7 +9,7 @@ module.exports = {
                 name: 'Full Name',
                 selector: '#txtFullName0',
                 type: 'TEXT',
-                value: process.env['CONTACT_FULL_NAME']
+                value: process.env['IT_TEST']
             },
             {
                 name: 'Date of Birth',
@@ -45,7 +45,7 @@ module.exports = {
                 name: 'Special Request',
                 selector: '#txtSpecialRequest',
                 type: 'TEXT',
-                value: process.env['CONTACT_FULL_NAME']
+                value: process.env['IT_TEST']
             },
             {
                 name: 'Telephone',
