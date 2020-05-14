@@ -5,6 +5,7 @@ const getTime = require('../../get-time')
 module.exports = {
     ver3Step1: function () {
         return [
+
             {
                 name: 'Date of Arrival',
                 selector: '#txtDateOfArrival',

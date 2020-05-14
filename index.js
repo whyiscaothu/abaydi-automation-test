@@ -1,18 +1,16 @@
 const puppeteer             = require('puppeteer');
 const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
+const fs                    = require('fs');
 require('dotenv').config();
 const dataSubmit            = require('./server');
-const { ver2Step1 }         = require('./selector/ver2/step1');
-const { ver2Step2a }        = require('./selector/ver2/step2a');
-const { ver2Step2b }        = require('./selector/ver2/step2b');
-const { ver3Step1 }         = require('./selector/ver3/step1');
-const { ver3Step2 }         = require('./selector/ver3/step2');
-const selectorVer2Step1     = ver2Step1();
-const selectorVer2Step2a    = ver2Step2a();
-const selectorVer2Step2b    = ver2Step2b();
-const selectorVer3Step1     = ver3Step1();
-const selectorVer3Step2     = ver3Step2();
+const { selectorVer2Step1 }         = require('./selector/ver2/step1');
+const { selectorVer2Step2a }        = require('./selector/ver2/step2a');
+const { selectorVer2Step2b }        = require('./selector/ver2/step2b');
+const { selectorVer3Step1 }         = require('./selector/ver3/step1');
+const { selectorVer3Step2 }         = require('./selector/ver3/step2');
+let marketplaces = fs.readdirSync('./selector',{ encoding:'utf8' });
+
 
 let NETWORK_PRESETS = {
     'GPRS': {
@@ -64,12 +62,6 @@ let NETWORK_PRESETS = {
         'latency': 2
     }
 }
-
-expect.setDefaultOptions({ timeout: 15000 });
-let isSendMailNotiDone,
-    isSendMailFailDone,
-    orderDone;
-
 let runAutomationTest = async () => {
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
@@ -89,6 +81,13 @@ let runAutomationTest = async () => {
             marketplace: "Cambodia",
             version: "2.1" || "2.2" || "3.0" || "4.0"
         }*/
+
+        if ( marketplaces.includes(item.marketplace) ) {
+            let marketplaceDetails = fs.readdirSync(`./selector/${item.marketplace}`,{ encoding:'utf8' });
+            if ( marketplaceDetails.includes(item.name) ) {
+
+            }
+        }
         await page.goto(item.url,{
             waitUntil: [
                 'load',
@@ -102,16 +101,16 @@ let runAutomationTest = async () => {
         // Set throttling property
         await client.send('Network.emulateNetworkConditions', NETWORK_PRESETS.WiFi);
 
-        isSendMailNotiDone          = 'false';
-        isSendMailFailDone          = 'false';
-        orderDone                   = 'false';
+        let isSendMailNotiDone          = 'false';
+        let isSendMailFailDone          = 'false';
+        let orderDone                   = 'false';
+        let version                     = item.version;
 
         let pickRandomValue = async selector => {
             let arrValue = await page.$$eval(`select${selector} option`, options => options.map(option => option.value));
             await arrValue.shift();//Remove first option in select tag.
             return arrValue[Math.floor(Math.random() * arrValue.length)];
         };
-        let version = item.version;
         switch (version) {
             case '2.1':
             case '2.2':
