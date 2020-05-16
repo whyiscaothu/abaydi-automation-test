@@ -9,6 +9,12 @@ module.exports.selectorVer3Step1 = [
         type: 'TEXT',
         value: getTime.date
     },
+    // {
+    //     name: 'Transportation Method',
+    //     selector: '[name="chkMethod"]',
+    //     type: 'RADIO',
+    //     value: null
+    // },
     {
         name: 'Port of Arrival',
         selector: '#selPortOfArrival',
@@ -67,7 +73,7 @@ module.exports.selectorVer3Step1 = [
         name: 'Mobile/Cell Telephone',
         selector: '#txtTelephone',
         type: 'TEXT',
-        value: faker.phone.phoneNumber()
+        value: process.env['CONTACT_PHONE_NUMBER']
     },
     {
         name: 'Continue Payment',

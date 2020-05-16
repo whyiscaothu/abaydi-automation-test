@@ -19,7 +19,7 @@ module.exports.selectorVer2Step2b = [
         name: 'Country',
         selector: '#selBillingCountry',
         type: 'SELECT',
-        value: process.env['CONTACT_VN_CODE_STRING']
+        value: '___RANDOM___'
     },
     {
         name: 'City',
@@ -61,6 +61,6 @@ module.exports.selectorVer2Step2b = [
         name: 'Payment Process',
         selector: '[name="btnStep2"]',
         type: 'BUTTON',
-        value: ''
+        value: null
     },
 ]

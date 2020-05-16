@@ -1,27 +1,32 @@
 module.exports.selectorVer2Step1 = [
     {
+        name: 'Number of Visa',
         selector: '#slNumberOfVisa',
-        type: 'CheckVer',
-        value: null
+        type: 'SELECT',
+        value: '1'
     },
     {
+        name: 'Transportation Method',
         selector: '[name="chkMethod"]',
         type: 'RADIO',
         value: 'airport'
     },
     {
+        name: 'Port of Arrival',
         selector: '#slPortOfArriVal',
         type: 'SELECT',
-        value: '2'
+        value: '___RANDOM___'
     },
     {
+        name: 'Processing Time',
         selector: 'input[name=chkVisaFee]',
         type: 'RADIO',
-        value: '1'
+        value: null
     },
     {
+        name: 'Continue',
         selector: '[name="btnStep1"]',
         type: 'BUTTON',
-        value: ''
+        value: null
     },
 ]

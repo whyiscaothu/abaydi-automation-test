@@ -52,7 +52,7 @@ module.exports.selectorVer3Step2 = [
         value: getTime.currentYear
     },
     {
-        name: 'Expiration Date',
+        name: 'CVV/CVC',
         selector: '#txtCardCVV',
         type: 'TEXT',
         value: process.env['CONTACT_CARD_CVV']

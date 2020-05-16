@@ -16,6 +16,12 @@ module.exports.selectorVer2Step2a = [
         value: getTime.birthdayVer2
     },
     {
+        name: 'Nationality',
+        selector: '#slNationality0',
+        type: 'SELECT',
+        value: '___RANDOM___'
+    },
+    {
         name: 'Email',
         selector: '#txtEmail',
         type: 'TEXT',
@@ -23,9 +29,15 @@ module.exports.selectorVer2Step2a = [
     },
     {
         name: 'Telephone',
+        selector: '#selZoneNumber',
+        type: 'SELECT',
+        value: '___RANDOM___'
+    },
+    {
+        name: 'Telephone',
         selector: '#txtTelephone',
         type: 'TEXT',
-        value: faker.phone.phoneNumber()
+        value: process.env['CONTACT_PHONE_NUMBER']
     },
     {
         name: 'Address',
@@ -46,28 +58,16 @@ module.exports.selectorVer2Step2a = [
         value: process.env['IT_TEST']
     },
     {
-        name: 'Telephone',
-        selector: '#selZoneNumber',
-        type: 'SELECT',
-        value: process.env['CONTACT_VN_CODE_STRING']
-    },
-    {
-        name: 'Nationality',
-        selector: '#slNationality0',
-        type: 'SELECT',
-        value: '253'
-    },
-    {
         name: 'Type of Visa',
         selector: '#slTypeVisa0',
         type: 'SELECT',
-        value: '3'
+        value: '___RANDOM___'
     },
     {
         name: 'Credit / Debit Card',
         selector: '#radMethodDirect',
         type: 'RADIO',
-        value: ''
+        value: null
     },
 ]
 
