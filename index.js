@@ -80,7 +80,7 @@ let runAutomationTest = async () => {
             marketplace: "Cambodia",
             version: "2.1" || "2.2" || "3.0" || "4.0"
         }*/
-        let versionForDir = item.version.trim();
+/*        let versionForDir = item.version.trim();
         switch (versionForDir) {
             case '2.1':
             case '2.2':
@@ -94,53 +94,29 @@ let runAutomationTest = async () => {
         let marketplaces = fs.readdirSync(`./selector/${versionForDir}`,{ encoding:'utf8' });
         if ( marketplaces.includes(item.marketplace) ) {
             let marketplaceSites = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}`,{ encoding:'utf8' });
-            if ( marketplaceSites.includes(item.name) ) {
-                /*let { step1 } = require(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1`) || 0;
-                if (step1) {
-                    if (step1.includes.length > 0) {
-                        for (let includeItem of step1.includes) {
-                            selectorVer3Step1.push(includeItem);
-                        }
-                    }
-                    if (step1.excludes.length > 0) {
-                        for (let excludeItem of step1.excludes) {
-                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
-                            selectorVer3Step1.splice(indexed, 1);
-                        }
-                    }
-                    if (step1.overrides.length > 0) {
-                        for (let overrideItem of step1.overrides) {
-                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
-                            selectorVer3Step1.splice(indexed, 1, overrideItem);
-                        }
-                    }
-                }*/
-            } else {
-                // let module = require(`./selector/ver3/australia/step1`);
-                /*if (module.step1) {
-                    if (module.step1.includes.length > 0) {
-                        for (let includeItem of module.step1.includes) {
-                            selectorVer3Step1.push(includeItem);
-                        }
-                    }
-                    if (module.step1.excludes.length > 0) {
-                        for (let excludeItem of module.step1.excludes) {
-                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
-                            selectorVer3Step1.splice(indexed, 1);
-                        }
-                    }
-                    if (module.step1.overrides.length > 0) {
-                        for (let overrideItem of module.step1.overrides) {
-                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
-                            selectorVer3Step1.splice(indexed, 1, overrideItem);
-                        }
-                    }
-                }*/
+            if (module.step1.includes.length > 0) {
+                for (let includeItem of module.step1.includes) {
+                    selectorVer3Step1.push(includeItem);
+                }
             }
+            if (module.step1.excludes.length > 0) {
+                for (let excludeItem of module.step1.excludes) {
+                    let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
+                    selectorVer3Step1.splice(indexed, 1);
+                }
+            }
+            if (module.step1.overrides.length > 0) {
+                for (let overrideItem of module.step1.overrides) {
+                    let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
+                    selectorVer3Step1.splice(indexed, 1, overrideItem);
+                }
+            }
+        }*/
+        let submitIndex = selectorVer3Step1.findIndex((index) => index.selector === process.env['SUBMIT_BUTTON_VER3'] || process.env['SUBMIT_BUTTON_VER2']);
+        let removedValues = selectorVer3Step1.splice(submitIndex, 1);
+        for (let value of removedValues) {
+            selectorVer3Step1.push(value)
         }
-/*        let submitIndex = selectorVer3Step1.findIndex((index) => index.selector === process.env['SUBMIT_BUTTON_VER3']);
-        let removedValue = selectorVer3Step1.splice(submitIndex, 1);
-        selectorVer3Step1.push(removedValue)*/
         await page.goto(item.url,{
             waitUntil: [
                 'load',
