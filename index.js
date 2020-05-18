@@ -11,7 +11,32 @@ const { selectorVer2Step2b }= require('./selector/ver2/step2b');
 const { selectorVer3Step1 } = require('./selector/ver3/step1');
 const { selectorVer3Step2 } = require('./selector/ver3/step2');
 
-
+let fillForm = async (selector, page) => {
+    for await (const item of selector) {
+        let isPresent = await page.$(item.selector) || null;
+        if (isPresent) {
+            switch (item.type) {
+                case "TEXT":
+                    await page.type(item.selector, item.value, { delay: 50 });
+                    break;
+                case "SELECT":
+                    let valueForSelect = '';
+                    if(item.value === '___RANDOM___'){
+                        valueForSelect = await helper.pickRandomValue(item.selector, page)
+                            .then(data => data);
+                    }else{
+                        valueForSelect = item.value;
+                    }
+                    await page.select(item.selector, valueForSelect);
+                    break;
+                case "RADIO":
+                case "BUTTON":
+                    await page.click(item.selector);
+                    break;
+            }
+        }
+    }
+}
 let NETWORK_PRESETS = {
     'GPRS': {
         'offline': false,
@@ -73,7 +98,6 @@ let runAutomationTest = async () => {
         retryLimit: 3,
         monitor: true,
     });
-
     await cluster.task(async ({ page, data: item }) => {
     /*  item: {
             url: "https://www.cambodiavisagov.asia/apply-visa",
@@ -153,11 +177,7 @@ let runAutomationTest = async () => {
         const client = await page.target().createCDPSession();
         // Set throttling property
         await client.send('Network.emulateNetworkConditions', NETWORK_PRESETS.WiFi);
-
-        let isSendMailNotiDone          = 'false';
-        let isSendMailFailDone          = 'false';
-        let orderDone                   = 'false';
-        let version                     = item.version;
+        let version = item.version;
         switch (version) {
             case '2.1':
             case '2.2':
@@ -171,145 +191,31 @@ let runAutomationTest = async () => {
         if (version === '2.0') {
             //Step 1
             helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER2_STEP1'], selectorVer2Step1);
-            for await (const item of selectorVer2Step1) {
-                //Check element is present
-                let isPresent = await page.$(item.selector) || null;
-                if (isPresent) {
-                    switch (item.type) {
-                        case "SELECT":
-                            let valueForSelect = '';
-                            if(item.value === '___RANDOM___'){
-                                valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                    .then(data => data);
-                            }else{
-                                valueForSelect = item.value;
-                            }
-                            await page.select(item.selector, valueForSelect);
-                            break;
-                        case "RADIO":
-                        case "BUTTON":
-                            await page.click(item.selector, { delay: 500 });
-                            break;
-                    }
-                }
-            }
+            await fillForm(selectorVer2Step1, page);
             //Step 2a
             helper.moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2A'], selectorVer2Step2a);
             for await (const item of selectorVer2Step2a) {
                 await page.waitForSelector(item.selector);
             }
-            for await (const item of selectorVer2Step2a) {
-                let isPresent = await page.$(item.selector) || null;
-                if (isPresent) {
-                    switch(item.type) {
-                        case "TEXT":
-                            await page.type(item.selector, item.value, { delay: 100 });
-                            break;
-                        case "SELECT":
-                            let valueForSelect = '';
-                            if(item.value === '___RANDOM___'){
-                                valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                    .then(data => data);
-                            }else{
-                                valueForSelect = item.value;
-                            }
-                            await page.select(item.selector, valueForSelect);
-                            break;
-                        case "RADIO":
-                        case "BUTTON":
-                            await page.click(item.selector);
-                            break;
-                    }
-                }
-            }
-            isSendMailNotiDone = 'true';
+            await fillForm(selectorVer2Step2a, page);
 
             //step 2b
             helper.moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2B'], selectorVer2Step2b);
             for await (const waitFor of selectorVer2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
-            for await (const item of selectorVer2Step2b) {
-                let isPresent = await page.$(item.selector) || null;
-                if (isPresent) {
-                    switch (item.type) {
-                        case "TEXT":
-                            await page.type(item.selector, item.value, { delay: 100 });
-                            break;
-                        case "SELECT":
-                            let valueForSelect = '';
-                            if(item.value === '___RANDOM___'){
-                                valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                    .then(data => data);
-                            }else{
-                                valueForSelect = item.value;
-                            }
-                            await page.select(item.selector, valueForSelect);
-                            break;
-                        case "BUTTON":
-                            await page.click(item.selector);
-                            break;
-                    }
-                }
-            }
+            await fillForm(selectorVer2Step2b, page);
+
         } else if (version === '3 or 4'){
             //Step 1
             helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP1'], selectorVer3Step1);
-            for await (const item of selectorVer3Step1) {
-                let isPresent = await page.$(item.selector) || null;
-                if (isPresent) {
-                    switch (item.type) {
-                        case "TEXT":
-                            await page.type(item.selector, item.value, { delay: 100 });
-                            // await expect(page).toFill(item.selector, item.value, { delay: 100 });
-                            break;
-                        case "SELECT":
-                            let valueForSelect = '';
-                            if(item.value === '___RANDOM___'){
-                                valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                    .then(data => data);
-                            }else{
-                                valueForSelect = item.value;
-                            }
-                            await page.select(item.selector, valueForSelect);
-                            break;
-                        case "RADIO":
-                        case "BUTTON":
-                            await page.click(item.selector);
-                            break;
-                    }
-                }
-            }
-            isSendMailNotiDone = 'true';
+            await fillForm(selectorVer3Step1, page);
             //Step 2
             helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP2'], selectorVer3Step2);
             for await (const waitFor of selectorVer3Step2) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
-            for await (const item of selectorVer3Step2) {
-                let isPresent = await page.$(item.selector) || null;
-                if (isPresent) {
-                    switch (item.type) {
-                        case "TEXT":
-                            await page.type(item.selector, item.value, { delay: 100 });
-                            break;
-                        case "SELECT":
-                            let valueForSelect = '';
-                            if(item.value === '___RANDOM___'){
-                                valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                    .then(data => data);
-                            }else{
-                                valueForSelect = item.value;
-                            }
-                            await page.select(item.selector, valueForSelect);
-                            break;
-                        case "RADIO":
-                        case "BUTTON":
-                            await page.click(item.selector);
-                            break;
-                    }
-                }
-            }
+            await fillForm(selectorVer3Step2, page);
         }
 
         await page.waitForNavigation({
@@ -320,7 +226,6 @@ let runAutomationTest = async () => {
                 'networkidle2'
             ]
         });
-
         await page.waitForNavigation({
             waitUntil: [
                 'load',
@@ -329,18 +234,6 @@ let runAutomationTest = async () => {
                 'networkidle2'
             ]
         });
-        isSendMailFailDone  = 'true';
-        orderDone           = 'true';
-        // Event handler to be called in case of problems
-        // cluster.on('taskerror', (err, data) => {
-        //     //In case of problem push error link back to urls array.
-        //     urls.urls.push(data);
-        //     exports.testProgress = {
-        //         isSendMailNotiDone,
-        //         isSendMailFailDone,
-        //         orderDone,
-        //     };
-        // });
     });
     for (let item of dataSubmit.dataSubmit) {
         if (item.run_order) {
