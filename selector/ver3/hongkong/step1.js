@@ -2,7 +2,7 @@ require('dotenv').config();
 const faker   = require('faker');
 const getTime = require('../../get-time')
 
-module.exports.selectorVer3Step1 = {
+module.exports.step = {
     includes: [
         {
             name: 'Identity card number',

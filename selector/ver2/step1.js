@@ -5,12 +5,12 @@ module.exports.selectorVer2Step1 = [
         type: 'SELECT',
         value: '1'
     },
-    // {
-    //     name: 'Transportation Method',
-    //     selector: '[name="chkMethod"]',
-    //     type: 'RADIO',
-    //     value: 'airport'
-    // },
+    {
+        name: 'Transportation Method',
+        selector: '[name="chkMethod"]',
+        type: 'RADIO',
+        value: 'airport'
+    },
     {
         name: 'Port of Arrival',
         selector: '#slPortOfArriVal',

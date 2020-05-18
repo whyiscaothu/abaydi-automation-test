@@ -2,7 +2,7 @@ require('dotenv').config();
 const faker   = require('faker');
 const getTime = require('../../get-time')
 
-module.exports.step1 = {
+module.exports.step = {
     includes: [
         {
             name: 'Do you have under 14 years old accompanying child(ren) included in your passport?',

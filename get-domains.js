@@ -10,13 +10,12 @@ const fs = require('fs');
 const path = require('path');
 
 const FOLDER_NAME_INPUT = "input";
-
+console.log('get domains name...');
 (async () => {
     await getInputFromFile();
 
     async function getInputFromFile() {
         await puppeteer.launch({
-            headless: false,
             ignoreHTTPSErrors: true,
         }).then(async browser => {
             await browser.newPage().then(async page => {
@@ -69,6 +68,7 @@ const FOLDER_NAME_INPUT = "input";
             });
 
             await browser.close();
+            console.log('complete!');
         });
     }
 })();

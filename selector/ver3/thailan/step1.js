@@ -2,7 +2,7 @@ require('dotenv').config();
 const faker   = require('faker');
 const getTime = require('../../get-time')
 
-module.exports.step1 = {
+module.exports.step = {
     includes: [
         {
             name: 'Date of Exit',

@@ -1,4 +1,4 @@
-module.exports.step1 = {
+module.exports.step = {
     includes: [
         {
             name: 'Are you an Australian permanent resident?',

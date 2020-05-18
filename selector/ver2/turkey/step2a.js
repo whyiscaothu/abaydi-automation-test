@@ -1,4 +1,4 @@
-module.exports.step2a = {
+module.exports.step = {
     includes: [
         {
             name: 'Passport Number',
