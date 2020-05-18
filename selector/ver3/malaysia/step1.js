@@ -1,6 +1,5 @@
 require('dotenv').config();
 const faker   = require('faker');
-const getTime = require('../../get-time')
 
 module.exports.step = {
     includes: [
@@ -32,7 +31,7 @@ module.exports.step = {
             name: 'Type of Visa',
             selector: '#selVisaType_0',
             type: 'SELECT',
-            value: '7'
+            value: '4'
         },
     ],
 

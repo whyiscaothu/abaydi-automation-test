@@ -105,28 +105,6 @@ let runAutomationTest = async () => {
             marketplace: "Cambodia",
             version: "2.1" || "2.2" || "3.0" || "4.0"
         }*/
-        let checkFilesExit = (fileCheck, fileName, selector, folderSite = '') => {
-            if (fileCheck) {
-                let {step} = require(`./selector/${versionForDir}/${item.marketplace}${folderSite}/${fileName}`);
-                if (step.includes.length) {
-                    for (let includeItem of step.includes) {
-                        selector.push(includeItem);
-                    }
-                }
-                if (step.excludes.length) {
-                    for (let excludeItem of step.excludes) {
-                        let indexed = selector.findIndex( (index) => index.selector === excludeItem.selector);
-                        selector.splice(indexed, 1);
-                    }
-                }
-                if (step.overrides.length) {
-                    for (let overrideItem of step.overrides) {
-                        let indexed = selector.findIndex( (index) => index.selector === overrideItem.selector);
-                        selector.splice(indexed, 1, overrideItem);
-                    }
-                }
-            }
-        }
         let versionForDir = item.version.trim();
         switch (versionForDir) {
             case '2.1':
@@ -138,31 +116,46 @@ let runAutomationTest = async () => {
                 versionForDir = 'ver3';
                 break;
         }
+        function processFinalArr (jsName, selector) {
+            let isStep = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
+            if (isStep) {
+                let {step} = require(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
+                if (step.overrides.length) {
+                    for (let overrideItem of step.overrides) {
+                        let indexed = selector.findIndex( (index) => index.selector === overrideItem.selector);
+                        selector.splice(indexed, 1, overrideItem);
+                    }
+                }
+                if (step.excludes.length) {
+                    for (let excludeItem of step.excludes) {
+                        let indexed = selector.findIndex( (index) => index.selector === excludeItem.selector);
+                        selector.splice(indexed, 1);
+                    }
+                }
+                if (step.includes.length) {
+                    for (let includeItem of step.includes) {
+                        selector.push(includeItem);
+                    }
+                }
+            }
+        }
         let marketplaces = fs.readdirSync(`./selector/${versionForDir}`,{ encoding:'utf8' });
         if ( marketplaces.includes(item.marketplace) ) {
             let marketplaceSites = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}`,{ encoding:'utf8' });
             if (marketplaceSites.includes(item.name)) {
-                let isFileVer3Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
-                let isFileVer3Step2Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2.js`);
-                let isFileVer2Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
-                let isFileVer2Step2aExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2a.js`);
-                let isFileVer2Step2bExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2b.js`);
-                checkFilesExit(isFileVer3Step1Exit, 'step1', selectorVer3Step1, `/${item.name}`);
-                checkFilesExit(isFileVer3Step2Exit, 'step2', selectorVer3Step2, `/${item.name}`);
-                checkFilesExit(isFileVer2Step1Exit, 'step1', selectorVer2Step1, `/${item.name}`);
-                checkFilesExit(isFileVer2Step2aExit, 'step2a', selectorVer2Step2a, `/${item.name}`);
-                checkFilesExit(isFileVer2Step2bExit, 'step2b', selectorVer2Step2b, `/${item.name}`);
+                // let isFileVer3Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
+                // let isFileVer3Step2Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2.js`);
+                // let isFileVer2Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
+                // let isFileVer2Step2aExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2a.js`);
+                // let isFileVer2Step2bExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2b.js`);
+                // checkFilesExit(isFileVer3Step1Exit, 'step1', selectorVer3Step1, `/${item.name}`);
+                // checkFilesExit(isFileVer3Step2Exit, 'step2', selectorVer3Step2, `/${item.name}`);
+                // checkFilesExit(isFileVer2Step1Exit, 'step1', selectorVer2Step1, `/${item.name}`);
+                // checkFilesExit(isFileVer2Step2aExit, 'step2a', selectorVer2Step2a, `/${item.name}`);
+                // checkFilesExit(isFileVer2Step2bExit, 'step2b', selectorVer2Step2b, `/${item.name}`);
             } else {
-                // let isFileVer3Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/step1.js`);
-                // let isFileVer3Step2Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/step2.js`);
-                // let isFileVer2Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/step1.js`);
-                // let isFileVer2Step2aExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/step2a.js`);
-                // let isFileVer2Step2bExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/step2b.js`);
-                // checkFilesExit(isFileVer3Step1Exit, 'step1', selectorVer3Step1);
-                // checkFilesExit(isFileVer3Step2Exit, 'step2', selectorVer3Step2);
-                // checkFilesExit(isFileVer2Step1Exit, 'step1', selectorVer2Step1);
-                // checkFilesExit(isFileVer2Step2aExit, 'step2a', selectorVer2Step2a);
-                // checkFilesExit(isFileVer2Step2bExit, 'step2b', selectorVer2Step2b);
+                processFinalArr('step1.js', selectorVer3Step1);
+                processFinalArr('step2a.js', selectorVer2Step2a);
             }
         }
         await page.goto(item.url,{
