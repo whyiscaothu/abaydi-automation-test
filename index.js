@@ -80,7 +80,7 @@ let runAutomationTest = async () => {
             marketplace: "Cambodia",
             version: "2.1" || "2.2" || "3.0" || "4.0"
         }*/
-/*        let versionForDir = item.version.trim();
+        let versionForDir = item.version.trim();
         switch (versionForDir) {
             case '2.1':
             case '2.2':
@@ -94,28 +94,52 @@ let runAutomationTest = async () => {
         let marketplaces = fs.readdirSync(`./selector/${versionForDir}`,{ encoding:'utf8' });
         if ( marketplaces.includes(item.marketplace) ) {
             let marketplaceSites = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}`,{ encoding:'utf8' });
-            if (module.step1.includes.length > 0) {
-                for (let includeItem of module.step1.includes) {
-                    selectorVer3Step1.push(includeItem);
+            if (marketplaceSites.includes(item.name)) {
+                let module = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1`,{ encoding:'utf8' });
+                if (module.step1.length > 0) {
+                    let {step1} = require(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1`);
+                    if (step1.includes.length) {
+                        for (let includeItem of step1.includes) {
+                            selectorVer3Step1.push(includeItem);
+                        }
+                    }
+                    if (step1.excludes.length) {
+                        for (let excludeItem of step1.excludes) {
+                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
+                            selectorVer3Step1.splice(indexed, 1);
+                        }
+                    }
+                    if (step1.overrides.length) {
+                        for (let overrideItem of step1.overrides) {
+                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
+                            selectorVer3Step1.splice(indexed, 1, overrideItem);
+                        }
+                    }
                 }
-            }
-            if (module.step1.excludes.length > 0) {
-                for (let excludeItem of module.step1.excludes) {
-                    let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
-                    selectorVer3Step1.splice(indexed, 1);
+            } else {
+                let module1 = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}/step1`,{ encoding:'utf8' });
+                if (module1.length > 0) {
+                    let {step1} = require(`./selector/${versionForDir}/${item.marketplace}/step1`);
+                    if (step1.includes.length) {
+                        for (let includeItem of step1.includes) {
+                            selectorVer3Step1.push(includeItem);
+                        }
+                    }
+                    if (step1.excludes.length > 0) {
+                        for (let excludeItem of step1.excludes) {
+                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === excludeItem.selector);
+                            selectorVer3Step1.splice(indexed, 1);
+                        }
+                    }
+                    if (step1.overrides.length) {
+                        for (let overrideItem of step1.overrides) {
+                            let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
+                            selectorVer3Step1.splice(indexed, 1, overrideItem);
+                        }
+                    }
                 }
+
             }
-            if (module.step1.overrides.length > 0) {
-                for (let overrideItem of module.step1.overrides) {
-                    let indexed = selectorVer3Step1.findIndex( (index) => index.selector === overrideItem.selector);
-                    selectorVer3Step1.splice(indexed, 1, overrideItem);
-                }
-            }
-        }*/
-        let submitIndex = selectorVer3Step1.findIndex((index) => index.selector === process.env['SUBMIT_BUTTON_VER3'] || process.env['SUBMIT_BUTTON_VER2']);
-        let removedValues = selectorVer3Step1.splice(submitIndex, 1);
-        for (let value of removedValues) {
-            selectorVer3Step1.push(value)
         }
         await page.goto(item.url,{
             waitUntil: [
@@ -135,6 +159,11 @@ let runAutomationTest = async () => {
         let orderDone                   = 'false';
         let version                     = item.version;
 
+        let moveSubmitToEnd = function (button, arrSelector) {
+            let submitIndex = arrSelector.findIndex((index) => index.selector === button);
+            let removedValues = arrSelector.splice(submitIndex, 1);
+            arrSelector.push(removedValues[0]);
+        }
         let pickRandomValue = async selector => {
             let arrValue = await page.$$eval(`select${selector} option`, options => options.map(option => option.value));
             await arrValue.shift();//Remove first option in select tag.
@@ -152,13 +181,21 @@ let runAutomationTest = async () => {
         }
         if (version === '2.0') {
             //Step 1
+            moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER2_STEP1'], selectorVer2Step1);
             for await (const item of selectorVer2Step1) {
                 //Check element is present
                 let isPresent = await page.$(item.selector) || null;
                 if (isPresent) {
                     switch (item.type) {
                         case "SELECT":
-                            await page.select(item.selector, item.value);
+                            let valueForSelect = '';
+                            if(item.value === '___RANDOM___'){
+                                valueForSelect = await pickRandomValue(item.selector)
+                                    .then(data => data);
+                            }else{
+                                valueForSelect = item.value;
+                            }
+                            await page.select(item.selector, valueForSelect);
                             break;
                         case "RADIO":
                         case "BUTTON":
@@ -168,6 +205,7 @@ let runAutomationTest = async () => {
                 }
             }
             //Step 2a
+            moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2A'], selectorVer2Step2a);
             for await (const item of selectorVer2Step2a) {
                 await page.waitForSelector(item.selector);
             }
@@ -179,7 +217,14 @@ let runAutomationTest = async () => {
                             await page.type(item.selector, item.value, { delay: 100 });
                             break;
                         case "SELECT":
-                            await page.select(item.selector, item.value);
+                            let valueForSelect = '';
+                            if(item.value === '___RANDOM___'){
+                                valueForSelect = await pickRandomValue(item.selector)
+                                    .then(data => data);
+                            }else{
+                                valueForSelect = item.value;
+                            }
+                            await page.select(item.selector, valueForSelect);
                             break;
                         case "RADIO":
                         case "BUTTON":
@@ -191,6 +236,7 @@ let runAutomationTest = async () => {
             isSendMailNotiDone = 'true';
 
             //step 2b
+            moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2B'], selectorVer2Step2b);
             for await (const waitFor of selectorVer2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
@@ -202,7 +248,14 @@ let runAutomationTest = async () => {
                             await page.type(item.selector, item.value, { delay: 100 });
                             break;
                         case "SELECT":
-                            await page.select(item.selector, item.value);
+                            let valueForSelect = '';
+                            if(item.value === '___RANDOM___'){
+                                valueForSelect = await pickRandomValue(item.selector)
+                                    .then(data => data);
+                            }else{
+                                valueForSelect = item.value;
+                            }
+                            await page.select(item.selector, valueForSelect);
                             break;
                         case "BUTTON":
                             await page.click(item.selector);
@@ -212,6 +265,7 @@ let runAutomationTest = async () => {
             }
         } else if (version === '3 or 4'){
             //Step 1
+            moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP1'], selectorVer3Step1);
             for await (const item of selectorVer3Step1) {
                 let isPresent = await page.$(item.selector) || null;
                 if (isPresent) {
@@ -240,6 +294,7 @@ let runAutomationTest = async () => {
             isSendMailNotiDone = 'true';
 
             //Step 2
+            moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP2'], selectorVer3Step2);
             for await (const waitFor of selectorVer3Step2) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
