@@ -19,7 +19,7 @@ module.exports.selectorVer2Step1 = [
     },
     {
         name: 'Processing Time',
-        selector: 'input[name=chkVisaFee]',
+        selector: '[name="chkVisaFee"]',
         type: 'RADIO',
         value: null
     },

@@ -1,6 +1,3 @@
-require('dotenv').config();
-const faker   = require('faker');
-
 module.exports.step = {
     includes: [
         {

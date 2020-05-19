@@ -3,21 +3,20 @@ const { Cluster }           = require('puppeteer-cluster');
 const expect                = require('expect-puppeteer');
 const fs                    = require('fs');
 require('dotenv').config();
-const { helper }            = require('./helpers/helpers');
 const dataSubmit            = require('./server');
 const { selectorVer2Step1 } = require('./selector/ver2/step1');
 const { selectorVer2Step2a }= require('./selector/ver2/step2a');
 const { selectorVer2Step2b }= require('./selector/ver2/step2b');
 const { selectorVer3Step1 } = require('./selector/ver3/step1');
 const { selectorVer3Step2 } = require('./selector/ver3/step2');
-
+const { helper }            = require('./helpers/helpers');
 let fillForm = async (selector, page) => {
     for await (const item of selector) {
         let isPresent = await page.$(item.selector) || null;
         if (isPresent) {
             switch (item.type) {
                 case "TEXT":
-                    await page.type(item.selector, item.value, { delay: 50 });
+                    await page.type(item.selector, item.value, { delay: 100 });
                     break;
                 case "SELECT":
                     let valueForSelect = '';
@@ -99,6 +98,11 @@ let runAutomationTest = async () => {
         monitor: true,
     });
     await cluster.task(async ({ page, data: item }) => {
+        let ver2Step1   = [...selectorVer2Step1]
+        let ver2Step2a  = [...selectorVer2Step2a]
+        let ver2Step2b  = [...selectorVer2Step2b]
+        let ver3Step1   = [...selectorVer3Step1]
+        let ver3Step2   = [...selectorVer3Step2]
     /*  item: {
             url: "https://www.cambodiavisagov.asia/apply-visa",
             name: "cambodiavisagovasia",
@@ -120,6 +124,7 @@ let runAutomationTest = async () => {
             let isStep = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
             if (isStep) {
                 let {step} = require(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
+                let indexBeforeSubmitBtn = (selector.length - 3);
                 if (step.overrides.length) {
                     for (let overrideItem of step.overrides) {
                         let indexed = selector.findIndex( (index) => index.selector === overrideItem.selector);
@@ -134,7 +139,7 @@ let runAutomationTest = async () => {
                 }
                 if (step.includes.length) {
                     for (let includeItem of step.includes) {
-                        selector.push(includeItem);
+                        selector.splice(indexBeforeSubmitBtn, 0, includeItem);
                     }
                 }
             }
@@ -143,19 +148,13 @@ let runAutomationTest = async () => {
         if ( marketplaces.includes(item.marketplace) ) {
             let marketplaceSites = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}`,{ encoding:'utf8' });
             if (marketplaceSites.includes(item.name)) {
-                // let isFileVer3Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
-                // let isFileVer3Step2Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2.js`);
-                // let isFileVer2Step1Exit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step1.js`);
-                // let isFileVer2Step2aExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2a.js`);
-                // let isFileVer2Step2bExit = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${item.name}/step2b.js`);
-                // checkFilesExit(isFileVer3Step1Exit, 'step1', selectorVer3Step1, `/${item.name}`);
-                // checkFilesExit(isFileVer3Step2Exit, 'step2', selectorVer3Step2, `/${item.name}`);
-                // checkFilesExit(isFileVer2Step1Exit, 'step1', selectorVer2Step1, `/${item.name}`);
-                // checkFilesExit(isFileVer2Step2aExit, 'step2a', selectorVer2Step2a, `/${item.name}`);
-                // checkFilesExit(isFileVer2Step2bExit, 'step2b', selectorVer2Step2b, `/${item.name}`);
+                //code goes here
             } else {
-                processFinalArr('step1.js', selectorVer3Step1);
-                processFinalArr('step2a.js', selectorVer2Step2a);
+                processFinalArr('step1.js', ver3Step1);
+                processFinalArr('step2.js', ver3Step2);
+                processFinalArr('step1.js', ver2Step1);
+                processFinalArr('step2a.js', ver2Step2a);
+                processFinalArr('step2b.js', ver2Step2b);
             }
         }
         await page.goto(item.url,{
@@ -183,32 +182,27 @@ let runAutomationTest = async () => {
         }
         if (version === '2.0') {
             //Step 1
-            helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER2_STEP1'], selectorVer2Step1);
-            await fillForm(selectorVer2Step1, page);
+            await fillForm(ver2Step1, page);
             //Step 2a
-            helper.moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2A'], selectorVer2Step2a);
-            for await (const item of selectorVer2Step2a) {
+            for await (const item of ver2Step2a) {
                 await page.waitForSelector(item.selector);
             }
-            await fillForm(selectorVer2Step2a, page);
+            await fillForm(ver2Step2a, page);
 
             //step 2b
-            helper.moveSubmitToEnd(process.env['RADIO_BUTTON_VER2_STEP2B'], selectorVer2Step2b);
-            for await (const waitFor of selectorVer2Step2b) {
+            for await (const waitFor of ver2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
-            await fillForm(selectorVer2Step2b, page);
+            await fillForm(ver2Step2b, page);
 
         } else if (version === '3 or 4'){
             //Step 1
-            helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP1'], selectorVer3Step1);
-            await fillForm(selectorVer3Step1, page);
+            await fillForm(ver3Step1, page);
             //Step 2
-            helper.moveSubmitToEnd(process.env['SUBMIT_BUTTON_VER3_STEP2'], selectorVer3Step2);
-            for await (const waitFor of selectorVer3Step2) {
+            for await (const waitFor of ver3Step2) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
-            await fillForm(selectorVer3Step2, page);
+            await fillForm(ver3Step2, page);
         }
 
         await page.waitForNavigation({

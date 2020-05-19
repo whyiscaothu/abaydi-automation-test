@@ -46,16 +46,16 @@ module.exports.selectorVer3Step1 = [
         value: '___RANDOM___'
     },
     {
-        name: 'Type of Visa',
-        selector: '#selVisaType_0',
-        type: 'SELECT',
-        value: '___RANDOM___'
-    },
-    {
         name: 'Full Name',
         selector: '#txtFullNameContact',
         type: 'TEXT',
         value: process.env['IT_TEST']
+    },
+    {
+        name: 'Type of Visa',
+        selector: '#selVisaType_0',
+        type: 'SELECT',
+        value: '___RANDOM___'
     },
     {
         name: 'Email Address',
