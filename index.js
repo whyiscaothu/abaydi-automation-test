@@ -10,19 +10,26 @@ const { selectorVer2Step2b }= require('./selector/ver2/step2b');
 const { selectorVer3Step1 } = require('./selector/ver3/step1');
 const { selectorVer3Step2 } = require('./selector/ver3/step2');
 const { helper }            = require('./helpers/helpers');
+let getUrlContainOrderId,
+    separateStr,
+    arrDataTested;
 let fillForm = async (selector, page) => {
     for await (const item of selector) {
         let isPresent = await page.$(item.selector) || null;
         if (isPresent) {
             switch (item.type) {
                 case "TEXT":
-                    await page.type(item.selector, item.value, { delay: 100 });
+                    await page.type(item.selector, item.value, { delay: 75 });
                     break;
                 case "SELECT":
                     let valueForSelect = '';
                     if(item.value === '___RANDOM___'){
                         valueForSelect = await helper.pickRandomValue(item.selector, page)
                             .then(data => data);
+                        if (valueForSelect === 'CA' || 'US') {
+                            valueForSelect = await helper.pickRandomValue(item.selector, page)
+                                .then(data => data);
+                        }
                     }else{
                         valueForSelect = item.value;
                     }
@@ -184,11 +191,8 @@ let runAutomationTest = async () => {
             //Step 1
             await fillForm(ver2Step1, page);
             //Step 2a
-            for await (const item of ver2Step2a) {
-                await page.waitForSelector(item.selector);
-            }
+            await page.waitFor( +process.env['WAIT_FOR_STEP2_LOAD'] ); //Wait N seconds before continuing next line
             await fillForm(ver2Step2a, page);
-
             //step 2b
             for await (const waitFor of ver2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
@@ -199,28 +203,25 @@ let runAutomationTest = async () => {
             //Step 1
             await fillForm(ver3Step1, page);
             //Step 2
-            for await (const waitFor of ver3Step2) {
-                await page.waitForSelector(waitFor.selector, {visible: true});
-            }
+            await page.waitFor( +process.env['WAIT_FOR_STEP2_LOAD'] ); //Wait N seconds before continuing next line
             await fillForm(ver3Step2, page);
         }
-
-        await page.waitForNavigation({
-            waitUntil: [
-                'load',
-                'domcontentloaded',
-                'networkidle0',
-                'networkidle2'
-            ]
-        });
-        await page.waitForNavigation({
-            waitUntil: [
-                'load',
-                'domcontentloaded',
-                'networkidle0',
-                'networkidle2'
-            ]
-        });
+        await page.waitFor( +process.env['WAIT_FOR_URL_CONTAIN_ORDER_ID'] );
+        // getUrlContainOrderId = await page.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
+        // separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
+        // let uri                     = separateStr[0].split(/\//g);   //['https:','www.egyptvisagov.com','apply-visa','confirm']
+        // uri.pop()                                                           //'confirm'
+        // let uriController           = uri.pop();                            //'apply-visa'
+        // let url                     = uri.join('//')                        //https://www.egyptvisagov.com
+        // let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
+        // let orderId                 = orderIdAndMethodPayment.pop();        //2015982
+        // let methodPayment           = orderIdAndMethodPayment.join(' ');    //info=credit or debit card fail
+        // arrDataTested.push({
+        //     url,
+        //     uriController,
+        //     orderId,
+        //     methodPayment
+        // })
     });
     for (let item of dataSubmit.dataSubmit) {
         if (item.run_order) {

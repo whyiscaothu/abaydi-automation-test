@@ -19,7 +19,7 @@ module.exports.selectorVer3Step2 = [
         name: 'Country',
         selector: '#drpCountryOfResidence',
         type: 'SELECT',
-        value: process.env['CONTACT_VN_CODE_STRING']
+        value: '___RANDOM___'
     },
     {
         name: 'City',

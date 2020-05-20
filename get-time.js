@@ -9,7 +9,7 @@ let birthdayYear        = today.getFullYear();
 let date                = `${currentYear}-${currentMonth}-${currentDatePlus}`;
 let dateVer2            = `${currentDatePlus}-${currentMonth}-${currentYear}`;
 let birthday            = `${birthdayYear}-${currentMonth}-${currentDate}`;
-let birthdayVer2        = `${currentDatePlus}-${currentMonth}-${birthdayYear}`;
+let birthdayVer2        = String(`${currentDatePlus}-${currentMonth}-${birthdayYear}`);
 today.setDate(currentDate + 15);
 let datePlus            = today.getDate().toString().padStart(2, "0");
 let dateExit            = `${currentYear}-${currentMonth}-${datePlus}`;
