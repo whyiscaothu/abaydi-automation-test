@@ -15,12 +15,12 @@ app.get('/', (req, res) => {
     res.send('ok');
 });
 
-app.post('/data-submit',(req, res) => {
+app.post('/data-submit', async (req, res) => {
     dataSubmit = req.body.dataSubmit;
     module.exports.dataSubmit = dataSubmit; //pass to index.js
 
-    runAutomationTest().catch(err => console.log(err));
-    res.redirect('/');
+    let arrDataTested = await runAutomationTest().catch(err => console.log(err));
+    res.json(arrDataTested);
 });
 app.post('/domains',(req, res) => {
     const data = fs.readFileSync('./domains.json', {

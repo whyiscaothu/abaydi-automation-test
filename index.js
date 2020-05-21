@@ -11,15 +11,14 @@ const { selectorVer3Step1 } = require('./selector/ver3/step1');
 const { selectorVer3Step2 } = require('./selector/ver3/step2');
 const { helper }            = require('./helpers/helpers');
 let getUrlContainOrderId,
-    separateStr,
-    arrDataTested;
+    separateStr;
 let fillForm = async (selector, page) => {
     for await (const item of selector) {
         let isPresent = await page.$(item.selector) || null;
         if (isPresent) {
             switch (item.type) {
                 case "TEXT":
-                    await page.type(item.selector, item.value, { delay: 75 });
+                    await page.type(item.selector, item.value, { delay: 5 });
                     break;
                 case "SELECT":
                     let valueForSelect = '';
@@ -94,11 +93,17 @@ let NETWORK_PRESETS = {
     }
 }
 let runAutomationTest = async () => {
+    let arrDataTested = [];
+
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
         maxConcurrency: 2,
         puppeteerOptions: {
-            headless: false
+            headless: false,
+            defaultViewport: null,
+            args: [
+                '--start-maximized' // you can also use '--start-fullscreen'
+            ]
         },
         timeout: 90000,
         retryLimit: 3,
@@ -189,10 +194,15 @@ let runAutomationTest = async () => {
         }
         if (version === '2.0') {
             //Step 1
+            await page.waitForSelector(ver2Step1[0].selector);
+            await helper.waitForClassNameDeleted(page, '#applyVisaForm', 'form-loading');
             await fillForm(ver2Step1, page);
+
             //Step 2a
-            await page.waitFor( +process.env['WAIT_FOR_STEP2_LOAD'] ); //Wait N seconds before continuing next line
+            await page.waitForSelector(ver2Step2a[0].selector);
+            await helper.waitForClassNameDeleted(page, '#applyVisaForm', 'form-loading');
             await fillForm(ver2Step2a, page);
+
             //step 2b
             for await (const waitFor of ver2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
@@ -206,22 +216,34 @@ let runAutomationTest = async () => {
             await page.waitFor( +process.env['WAIT_FOR_STEP2_LOAD'] ); //Wait N seconds before continuing next line
             await fillForm(ver3Step2, page);
         }
-        await page.waitFor( +process.env['WAIT_FOR_URL_CONTAIN_ORDER_ID'] );
-        // getUrlContainOrderId = await page.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
-        // separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
-        // let uri                     = separateStr[0].split(/\//g);   //['https:','www.egyptvisagov.com','apply-visa','confirm']
-        // uri.pop()                                                           //'confirm'
-        // let uriController           = uri.pop();                            //'apply-visa'
-        // let url                     = uri.join('//')                        //https://www.egyptvisagov.com
-        // let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
-        // let orderId                 = orderIdAndMethodPayment.pop();        //2015982
-        // let methodPayment           = orderIdAndMethodPayment.join(' ');    //info=credit or debit card fail
-        // arrDataTested.push({
-        //     url,
-        //     uriController,
-        //     orderId,
-        //     methodPayment
-        // })
+
+        const finalResponse = await page.waitForResponse(response => response.url().includes(item.url + '/confirm?info=credit-or-debit-card') && response.status() === 200);
+        // console.log(finalResponse.url());
+
+
+        try{
+            getUrlContainOrderId = finalResponse.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
+            separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
+            let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
+            let orderId                 = orderIdAndMethodPayment.pop();        //2015982
+            let paymentStatus           = orderIdAndMethodPayment.pop();        //fail
+            let paymentMethod           = orderIdAndMethodPayment.join(' ');    //info=credit or debit card
+            paymentMethod               = paymentMethod.replace('info=', '');    //credit or debit card
+            arrDataTested.push({
+                marketplace: item.marketplace,
+                name: item.url.replace('https://www.', '').split('/')[0],
+                version: item.version,
+                resultOrder: {
+                    orderId: orderId,
+                    paymentMethod: paymentMethod,
+                    paymentStatus: paymentStatus,
+                }
+            });
+
+            // console.log(arrDataTested);
+        }catch (e) {
+            console.log(e)
+        }
     });
     for (let item of dataSubmit.dataSubmit) {
         if (item.run_order) {
@@ -251,5 +273,7 @@ let runAutomationTest = async () => {
     }
     await cluster.idle();
     await cluster.close();
+
+    return arrDataTested;
 };
 exports.runAutomationTest = runAutomationTest;
