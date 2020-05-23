@@ -18,7 +18,7 @@ let fillForm = async (selector, page) => {
         if (isPresent) {
             switch (item.type) {
                 case "TEXT":
-                    await page.type(item.selector, item.value, { delay: 5 });
+                    await page.type(item.selector, item.value, { delay: 1 });
                     break;
                 case "SELECT":
                     let valueForSelect = '';
@@ -227,6 +227,7 @@ let runAutomationTest = async () => {
             //Step 1
             await fillForm(ver3Step1, page);
             //Step 2
+            await page.waitForSelector('#applyPaymentForm')
             await page.waitForSelector(ver3Step2[0].selector);
 
             // remove tawkto
