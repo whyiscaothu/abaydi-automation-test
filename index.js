@@ -192,6 +192,13 @@ let runAutomationTest = async () => {
                 version = '3 or 4';
                 break;
         }
+
+        // remove tawkto
+        await page.waitForSelector('iframe[title="chat widget"]');
+        await page.evaluate(() => {
+            document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+        });
+
         if (version === '2.0') {
             //Step 1
             await page.waitForSelector(ver2Step1[0].selector);
@@ -201,6 +208,13 @@ let runAutomationTest = async () => {
             //Step 2a
             await page.waitForSelector(ver2Step2a[0].selector);
             await helper.waitForClassNameDeleted(page, '#applyVisaForm', 'form-loading');
+
+            // remove tawkto
+            await page.waitForSelector('iframe[title="chat widget"]');
+            await page.evaluate(() => {
+                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+            });
+
             await fillForm(ver2Step2a, page);
 
             //step 2b
@@ -213,7 +227,14 @@ let runAutomationTest = async () => {
             //Step 1
             await fillForm(ver3Step1, page);
             //Step 2
-            await page.waitFor( +process.env['WAIT_FOR_STEP2_LOAD'] ); //Wait N seconds before continuing next line
+            await page.waitForSelector(ver3Step2[0].selector);
+
+            // remove tawkto
+            await page.waitForSelector('iframe[title="chat widget"]');
+            await page.evaluate(() => {
+                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+            });
+
             await fillForm(ver3Step2, page);
         }
 
