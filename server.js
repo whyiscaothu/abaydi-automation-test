@@ -43,7 +43,7 @@ app.post('/data-submit', async (req, res) => {
 app.post('/test-result', async (req, res) => {
     let ret = [];
     await fs.readdirSync(PATH_FOLDER_RESULT).forEach(file => {
-        if(file.toLowerCase().substring(file.length - 5) == ".json"){
+        if(file.toLowerCase().substring(file.length - 5) === ".json"){
             const data = fs.readFileSync(PATH_FOLDER_RESULT + '/' + file, {
                 encoding:'utf8',
                 flag:'r'

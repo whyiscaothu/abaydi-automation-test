@@ -101,13 +101,10 @@ let runAutomationTest = async () => {
         puppeteerOptions: {
             headless: false,
             defaultViewport: null,
-            args: [
-                '--start-maximized' // you can also use '--start-fullscreen'
-            ]
         },
         timeout: 90000,
         retryLimit: 3,
-        monitor: true,
+        monitor: false,
     });
     await cluster.task(async ({ page, data: item }) => {
         let ver2Step1   = [...selectorVer2Step1]
@@ -194,10 +191,15 @@ let runAutomationTest = async () => {
         }
 
         // remove tawkto
-        await page.waitForSelector('iframe[title="chat widget"]');
-        await page.evaluate(() => {
-            document.querySelector('iframe[title="chat widget"]').parentNode.remove()
-        });
+        try{
+            await page.waitForSelector('iframe[title="chat widget"]');
+            await page.$$('iframe[title="chat widget"]').parentNode.remove();
+        }catch (e) {
+            console.log(e);
+        }
+        // await page.evaluate(() => {
+        //     document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+        // });
 
         if (version === '2.0') {
             //Step 1
@@ -211,9 +213,7 @@ let runAutomationTest = async () => {
 
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
-            await page.evaluate(() => {
-                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
-            });
+            await page.$$('iframe[title="chat widget"]').parentNode.remove();
 
             await fillForm(ver2Step2a, page);
 
@@ -232,9 +232,7 @@ let runAutomationTest = async () => {
 
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
-            await page.evaluate(() => {
-                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
-            });
+            await page.$$('iframe[title="chat widget"]').parentNode.remove();
 
             await fillForm(ver3Step2, page);
         }
