@@ -16,7 +16,7 @@ module.exports.helper = {
         return result;
     },
     processFinalArr: async (jsName, selector, marketplace, versionDir) => {
-        let isStep = fs.existsSync(`./selector/${versionDir}/${marketplace}/${jsName}`);
+        let isStep = fs.existsSync(`../selector/${versionDir}/${marketplace}/${jsName}`);
         if (isStep) {
             let {step} = require(`./selector/${versionDir}/${marketplace}/${jsName}`);
             let indexBeforeSubmitBtn = (selector.length - 3);

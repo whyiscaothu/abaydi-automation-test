@@ -2,7 +2,7 @@ module.exports.step = {
     includes: [
         {
             name: 'Do you have under 14 years old accompanying child(ren) included in your passport?',
-            selector: '#chkIsChaperone_0',
+            selector: '#chkIsChaperone[0]',
             type: 'RADIO',
             value: null
         },
