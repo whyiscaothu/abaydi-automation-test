@@ -97,7 +97,7 @@ let runAutomationTest = async () => {
 
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
-        maxConcurrency: 2,
+        maxConcurrency: 4,
         puppeteerOptions: {
             headless: false,
             defaultViewport: null,
@@ -129,41 +129,17 @@ let runAutomationTest = async () => {
                 versionForDir = 'ver3';
                 break;
         }
-        function processFinalArr (jsName, selector) {
-            let isStep = fs.existsSync(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
-            if (isStep) {
-                let {step} = require(`./selector/${versionForDir}/${item.marketplace}/${jsName}`);
-                let indexBeforeSubmitBtn = (selector.length - 3);
-                if (step.overrides.length) {
-                    for (let overrideItem of step.overrides) {
-                        let indexed = selector.findIndex( (index) => index.selector === overrideItem.selector);
-                        selector.splice(indexed, 1, overrideItem);
-                    }
-                }
-                if (step.excludes.length) {
-                    for (let excludeItem of step.excludes) {
-                        let indexed = selector.findIndex( (index) => index.selector === excludeItem.selector);
-                        selector.splice(indexed, 1);
-                    }
-                }
-                if (step.includes.length) {
-                    for (let includeItem of step.includes) {
-                        selector.splice(indexBeforeSubmitBtn, 0, includeItem);
-                    }
-                }
-            }
-        }
         let marketplaces = fs.readdirSync(`./selector/${versionForDir}`,{ encoding:'utf8' });
         if ( marketplaces.includes(item.marketplace) ) {
             let marketplaceSites = fs.readdirSync(`./selector/${versionForDir}/${item.marketplace}`,{ encoding:'utf8' });
             if (marketplaceSites.includes(item.name)) {
                 //code goes here
             } else {
-                processFinalArr('step1.js', ver3Step1);
-                processFinalArr('step2.js', ver3Step2);
-                processFinalArr('step1.js', ver2Step1);
-                processFinalArr('step2a.js', ver2Step2a);
-                processFinalArr('step2b.js', ver2Step2b);
+                await helper.processFinalArr('step1.js', ver3Step1, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2.js', ver3Step2, item.marketplace, versionForDir);
+                await helper.processFinalArr('step1.js', ver2Step1, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2a.js', ver2Step2a, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2b.js', ver2Step2b, item.marketplace, versionForDir);
             }
         }
         await page.goto(item.url,{
@@ -191,15 +167,10 @@ let runAutomationTest = async () => {
         }
 
         // remove tawkto
-        try{
-            await page.waitForSelector('iframe[title="chat widget"]');
-            await page.$$('iframe[title="chat widget"]').parentNode.remove();
-        }catch (e) {
-            console.log(e);
-        }
-        // await page.evaluate(() => {
-        //     document.querySelector('iframe[title="chat widget"]').parentNode.remove()
-        // });
+        await page.waitForSelector('iframe[title="chat widget"]');
+        await page.evaluate(() => {
+            document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+        });
 
         if (version === '2.0') {
             //Step 1
@@ -213,7 +184,9 @@ let runAutomationTest = async () => {
 
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
-            await page.$$('iframe[title="chat widget"]').parentNode.remove();
+            await page.evaluate(() => {
+                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+            });
 
             await fillForm(ver2Step2a, page);
 
@@ -232,7 +205,9 @@ let runAutomationTest = async () => {
 
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
-            await page.$$('iframe[title="chat widget"]').parentNode.remove();
+            await page.evaluate(() => {
+                document.querySelector('iframe[title="chat widget"]').parentNode.remove()
+            });
 
             await fillForm(ver3Step2, page);
         }
@@ -240,30 +215,23 @@ let runAutomationTest = async () => {
         const finalResponse = await page.waitForResponse(response => response.url().includes(item.url + '/confirm?info=credit-or-debit-card') && response.status() === 200);
         // console.log(finalResponse.url());
 
-
-        try{
-            getUrlContainOrderId = finalResponse.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
-            separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
-            let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
-            let orderId                 = orderIdAndMethodPayment.pop();        //2015982
-            let paymentStatus           = orderIdAndMethodPayment.pop();        //fail
-            let paymentMethod           = orderIdAndMethodPayment.join(' ');    //info=credit or debit card
-            paymentMethod               = paymentMethod.replace('info=', '');    //credit or debit card
-            arrDataTested.push({
-                marketplace: item.marketplace,
-                name: item.url.replace('https://www.', '').split('/')[0],
-                version: item.version,
-                resultOrder: {
-                    orderId: orderId,
-                    paymentMethod: paymentMethod,
-                    paymentStatus: paymentStatus,
-                }
-            });
-
-            // console.log(arrDataTested);
-        }catch (e) {
-            console.log(e)
-        }
+        getUrlContainOrderId = finalResponse.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
+        separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
+        let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
+        let orderId                 = orderIdAndMethodPayment.pop();        //2015982
+        let paymentStatus           = orderIdAndMethodPayment.pop();        //fail
+        let paymentMethod           = orderIdAndMethodPayment.join(' ');    //info=credit or debit card
+        paymentMethod               = paymentMethod.replace('info=', '');    //credit or debit card
+        arrDataTested.push({
+            marketplace: item.marketplace,
+            name: item.url.replace('https://www.', '').split('/')[0],
+            version: item.version,
+            resultOrder: {
+                orderId: orderId,
+                paymentMethod: paymentMethod,
+                paymentStatus: paymentStatus,
+            }
+        });
     });
     for (let item of dataSubmit.dataSubmit) {
         if (item.run_order) {
