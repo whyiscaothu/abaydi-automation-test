@@ -48,8 +48,10 @@ app.post('/test-result', async (req, res) => {
                 encoding:'utf8',
                 flag:'r'
             });
+            let name = file.toLowerCase().replace('.json', '');
             let dataJson = JSON.parse(data);
             ret.push({
+                name,
                 filename: file,
                 data: dataJson
             })
