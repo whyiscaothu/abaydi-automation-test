@@ -2,7 +2,7 @@ require('dotenv').config();
 const faker   = require('faker');
 const getTime = require('../../get-time')
 
-module.exports.selectorVer3Step2 = [
+module.exports.selectorsVer3Step2 = [
     {
         name: 'First Name',
         selector: '#txtFirstName',

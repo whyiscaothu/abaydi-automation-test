@@ -4,44 +4,17 @@ const expect                = require('expect-puppeteer');
 const fs                    = require('fs');
 require('dotenv').config();
 const dataSubmit            = require('./server');
-const { selectorVer2Step1 } = require('./selector/ver2/step1');
-const { selectorVer2Step2a }= require('./selector/ver2/step2a');
-const { selectorVer2Step2b }= require('./selector/ver2/step2b');
-const { selectorVer3Step1 } = require('./selector/ver3/step1');
-const { selectorVer3Step2 } = require('./selector/ver3/step2');
+const { selectorsVer2Step1 } = require('./selector/ver2/step1');
+const { selectorsVer2Step2a }= require('./selector/ver2/step2a');
+const { selectorsVer2Step2b }= require('./selector/ver2/step2b');
+const { selectorsVer3Step1 } = require('./selector/ver3/step1');
+const { selectorsVer3Step2 } = require('./selector/ver3/step2');
 const { helper }            = require('./helpers/helpers');
-let getUrlContainOrderId,
-    separateStr;
-let fillForm = async (selector, page) => {
-    for await (const item of selector) {
-        let isPresent = await page.$(item.selector) || null;
-        if (isPresent) {
-            switch (item.type) {
-                case "TEXT":
-                    await page.type(item.selector, item.value, { delay: 1 });
-                    break;
-                case "SELECT":
-                    let valueForSelect = '';
-                    if(item.value === '___RANDOM___'){
-                        valueForSelect = await helper.pickRandomValue(item.selector, page)
-                            .then(data => data);
-                        if (valueForSelect === 'CA' || 'US') {
-                            valueForSelect = await helper.pickRandomValue(item.selector, page)
-                                .then(data => data);
-                        }
-                    }else{
-                        valueForSelect = item.value;
-                    }
-                    await page.select(item.selector, valueForSelect);
-                    break;
-                case "RADIO":
-                case "BUTTON":
-                    await page.click(item.selector);
-                    break;
-            }
-        }
-    }
-}
+let getUrlContainOrderId;
+let separateStr;
+let filteredDataSubmit = [];
+let maxConcurrency = 4;
+let concurrency;
 let NETWORK_PRESETS = {
     'GPRS': {
         'offline': false,
@@ -94,10 +67,21 @@ let NETWORK_PRESETS = {
 }
 let runAutomationTest = async () => {
     let arrDataTested = [];
-
+    for (let item of dataSubmit.dataSubmit) {
+        if (item.run_order) {
+            filteredDataSubmit.push(helper.filterDataSubmit('apply-visa', item.name, item.marketplace, item.version));
+        }
+        if (item.run_payment) {
+            filteredDataSubmit.push(helper.filterDataSubmit('make-payment', item.name, item.marketplace, item.version));
+        }
+        if (item.run_contact) {
+            filteredDataSubmit.push(helper.filterDataSubmit('contact-us', item.name, item.marketplace, item.version));
+        }
+    }
+    concurrency = (filteredDataSubmit.length > maxConcurrency) ? maxConcurrency : filteredDataSubmit.length;
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
-        maxConcurrency: 4,
+        maxConcurrency: concurrency,
         puppeteerOptions: {
             headless: false,
             defaultViewport: null,
@@ -107,11 +91,11 @@ let runAutomationTest = async () => {
         monitor: false,
     });
     await cluster.task(async ({ page, data: item }) => {
-        let ver2Step1   = [...selectorVer2Step1]
-        let ver2Step2a  = [...selectorVer2Step2a]
-        let ver2Step2b  = [...selectorVer2Step2b]
-        let ver3Step1   = [...selectorVer3Step1]
-        let ver3Step2   = [...selectorVer3Step2]
+        let ver2Step1   = [...selectorsVer2Step1]
+        let ver2Step2a  = [...selectorsVer2Step2a]
+        let ver2Step2b  = [...selectorsVer2Step2b]
+        let ver3Step1   = [...selectorsVer3Step1]
+        let ver3Step2   = [...selectorsVer3Step2]
     /*  item: {
             url: "https://www.cambodiavisagov.asia/apply-visa",
             name: "cambodiavisagovasia",
@@ -165,7 +149,6 @@ let runAutomationTest = async () => {
                 version = '3 or 4';
                 break;
         }
-
         // remove tawkto
         await page.waitForSelector('iframe[title="chat widget"]');
         await page.evaluate(() => {
@@ -176,45 +159,36 @@ let runAutomationTest = async () => {
             //Step 1
             await page.waitForSelector(ver2Step1[0].selector);
             await helper.waitForClassNameDeleted(page, '#applyVisaForm', 'form-loading');
-            await fillForm(ver2Step1, page);
-
+            await helper.fillForm(ver2Step1, page);
             //Step 2a
             await page.waitForSelector(ver2Step2a[0].selector);
             await helper.waitForClassNameDeleted(page, '#applyVisaForm', 'form-loading');
-
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
             await page.evaluate(() => {
                 document.querySelector('iframe[title="chat widget"]').parentNode.remove()
             });
-
-            await fillForm(ver2Step2a, page);
-
+            await helper.fillForm(ver2Step2a, page);
             //step 2b
             for await (const waitFor of ver2Step2b) {
                 await page.waitForSelector(waitFor.selector, {visible: true});
             }
-            await fillForm(ver2Step2b, page);
-
+            await helper.fillForm(ver2Step2b, page);
         } else if (version === '3 or 4'){
             //Step 1
-            await fillForm(ver3Step1, page);
+            await helper.fillForm(ver3Step1, page);
             //Step 2
             await page.waitForSelector('#applyPaymentForm')
             await page.waitForSelector(ver3Step2[0].selector);
-
             // remove tawkto
             await page.waitForSelector('iframe[title="chat widget"]');
             await page.evaluate(() => {
                 document.querySelector('iframe[title="chat widget"]').parentNode.remove()
             });
-
-            await fillForm(ver3Step2, page);
+            await helper.fillForm(ver3Step2, page);
         }
-
         const finalResponse = await page.waitForResponse(response => response.url().includes(item.url + '/confirm?info=credit-or-debit-card') && response.status() === 200);
         // console.log(finalResponse.url());
-
         getUrlContainOrderId = finalResponse.url();                            //https://www.egyptvisagov.com/apply-visa/confirm?info=credit-or-debit-card-fail-2015982
         separateStr = getUrlContainOrderId.split(/\?/g);                    //['https://www.egyptvisagov.com/apply-visa/confirm','info=credit-or-debit-card-fail-2015982']
         let orderIdAndMethodPayment = separateStr[1].split(/-/g);    //['info=credit','or','debit','card','fail','2015982']
@@ -233,35 +207,13 @@ let runAutomationTest = async () => {
             }
         });
     });
-    for (let item of dataSubmit.dataSubmit) {
-        if (item.run_order) {
-            await cluster.queue({
-                url: `https://www.${item.name}/apply-visa`,
-                name: item.name.toLowerCase().trim().replace(/\./g, ''),
-                marketplace: item.marketplace.toLowerCase().trim().replace(/ /g, ''),
-                version: item.version,
-            });
-        }
-        if (item.run_payment) {
-            await cluster.queue({
-                url: `https://www.${item.name}/make-payment`,
-                name: item.name.toLowerCase().trim().replace(/\./g, ''),
-                marketplace: item.marketplace.toLowerCase().trim().replace(/ /g, ''),
-                version: item.version,
-            });
-        }
-        if (item.run_contact) {
-            await cluster.queue({
-                url: `https://www.${item.name}/contact-us`,
-                name: item.name.toLowerCase().trim().replace(/\./g, ''),
-                marketplace: item.marketplace.toLowerCase().trim().replace(/ /g, ''),
-                version: item.version,
-            });
-        }
+    for (let item of filteredDataSubmit) {
+        await cluster.queue(item);
     }
     await cluster.idle();
     await cluster.close();
 
     return arrDataTested;
 };
+
 exports.runAutomationTest = runAutomationTest;

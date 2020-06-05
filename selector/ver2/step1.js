@@ -1,4 +1,4 @@
-module.exports.selectorVer2Step1 = [
+module.exports.selectorsVer2Step1 = [
     {
         name: 'Number of Visa',
         selector: '#slNumberOfVisa',
