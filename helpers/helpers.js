@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path')
+
 module.exports.helper = {
     pickRandomValue: async (selector, page) => {
         let arrValue = await page.$$eval(`select${selector} option`, options => options.map(option => option.value));
@@ -16,9 +18,10 @@ module.exports.helper = {
         return result;
     },
     processFinalArr: async (jsName, selector, marketplace, versionDir) => {
-        let isStep = fs.existsSync(`../selector/${versionDir}/${marketplace}/${jsName}`);
+        let pathToStepFile = path.resolve(__dirname, `../selector/${versionDir}/${marketplace}/${jsName}`)
+        let isStep = fs.existsSync(pathToStepFile);
         if (isStep) {
-            let {step} = require(`./selector/${versionDir}/${marketplace}/${jsName}`);
+            let {step} = require(pathToStepFile);
             let indexBeforeSubmitBtn = (selector.length - 3);
             if (step.overrides.length) {
                 for (let overrideItem of step.overrides) {

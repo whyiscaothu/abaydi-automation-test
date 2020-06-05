@@ -135,15 +135,11 @@ let runAutomationTest = async () => {
             if (marketplaceSites.includes(item.name)) {
                 //code goes here
             } else {
-                try{
-                    await helper.processFinalArr('step1.js', ver3Step1, item.marketplace, versionForDir);
-                    await helper.processFinalArr('step2.js', ver3Step2, item.marketplace, versionForDir);
-                    await helper.processFinalArr('step1.js', ver2Step1, item.marketplace, versionForDir);
-                    await helper.processFinalArr('step2a.js', ver2Step2a, item.marketplace, versionForDir);
-                    await helper.processFinalArr('step2b.js', ver2Step2b, item.marketplace, versionForDir);
-                }catch (e) {
-                    console.log(e);
-                }
+                await helper.processFinalArr('step1.js', ver3Step1, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2.js', ver3Step2, item.marketplace, versionForDir);
+                await helper.processFinalArr('step1.js', ver2Step1, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2a.js', ver2Step2a, item.marketplace, versionForDir);
+                await helper.processFinalArr('step2b.js', ver2Step2b, item.marketplace, versionForDir);
             }
         }
         await page.goto(item.url,{
